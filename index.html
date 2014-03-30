@@ -1,1 +1,690 @@
-My Octopress Page is coming soon &hellip;
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>rspeer</title>
+  <meta name="author" content="Rob Speer">
+
+  
+  <meta name="description" content="A few months ago I posted a Gist about ways to totally break Python&rsquo;s Unicode representation, by exploiting bug #19279 in its UTF-7 decoder. &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://rspeer.github.io/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+   <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="rspeer" type="application/atom+xml">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href='http://fonts.googleapis.com/css?family=Lato:400,100,100italic,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Lora:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:200,300,400,500,600,700,900' rel='stylesheet' type='text/css'>
+
+
+
+
+  
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+</hgroup>
+
+</header>
+  <!-- <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:rspeer.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav> -->
+  <div id="main">
+    <div id="content">
+      <div class="blog-index">
+  
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/03/30/unicode-deadbeef/">U+DEADBEEF: Why you shouldn&#8217;t trust arbitrary text encodings</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-30T15:22:50-04:00" pubdate data-updated="true">Mar 30<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>A few months ago I posted a <a href="https://gist.github.com/rspeer/7559750">Gist about ways to totally break Python&rsquo;s Unicode representation</a>, by exploiting <a href="http://bugs.python.org/issue19279">bug #19279</a> in its UTF-7 decoder.</p>
+
+<p>The bug (which is fixed now) is that the encoder doesn&rsquo;t reset its state correctly when it encounters an erroneous UTF-7 sequence. You can make these errors pile up, until they add up to an impossible character, at codepoint U+DEADBEEF.</p>
+
+<p>(While Unicode codepoints are often represented as 32-bit integers, not all 32-bit integers are Unicode codepoints. The highest possible Unicode codepoint is U+10FFFF.)</p>
+
+<p>Once you have this impossible character in a string, you can pass it to standard library functions to cause all sorts of data corruption, including making a SQLite database unreadable.</p>
+
+<p>There&rsquo;s one easy lesson to take from this: keep Python up to date. If you&rsquo;re on Python 2.7.6 or later, you won&rsquo;t encounter this particular bug. But then, this isn&rsquo;t <a href="http://bugs.python.org/issue20538">the last UTF-7 bug</a> in Python.</p>
+
+<p>Here&rsquo;s the more important lesson, though, which applies in any programming language:</p>
+
+<h2>Don&rsquo;t let someone else&rsquo;s data tell your code what to do</h2>
+
+<p>When people initially uncover these encoding bugs, it is often because they are <a href="http://bugs.python.org/issue19279#msg200117">scraping the Web</a>, or e-mails, or some other format where you can tell the recipient what encoding your text is in. There&rsquo;s lots of code out there that will read that metadata and use the appropriate decoder in Python.</p>
+
+<p>This is kind of dangerous. You&rsquo;re letting data you didn&rsquo;t create determine what your code does. If a Web page says it&rsquo;s in UTF-7, it&rsquo;ll use the UTF-7 decoder, which you&rsquo;ve probably never used before. If it says it&rsquo;s in <code>gzip_codec</code> and contains a <a href="https://mail.python.org/pipermail/python-dev/2013-November/130188.html">gzip bomb</a>, boom.</p>
+
+<p>Some of these attacks are theoretical, but there are a few real web pages out there that &mdash; perhaps accidentally &mdash; claim to be in UTF-7 and trigger bug #19279. Really, it shouldn&rsquo;t matter what the Web page you&rsquo;re scraping claims: your code has <em>no business</em> firing up the UTF-7 decoder, which it usually doesn&rsquo;t do, just because some Web page told it to.</p>
+
+<h2>UTF-7 is a vulnerability</h2>
+
+<p>Even if the decoder were bug-free, UTF-7 would be a totally unsuitable encoding for exchanging data. The fact that you can hide ASCII characters as other strings in UTF-7 has been used in <a href="http://nedbatchelder.com/blog/200704/xss_with_utf7.html">a real XSS vulnerability</a> that was only fixed by major Web browsers disabling automatic UTF-7 decoding.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>+ADw-script+AD4-alert(+ACc-xss+ACc-)+ADw-+AC8-script+AD4-</span></code></pre></td></tr></table></div></figure>
+
+
+<p>UTF-7 isn&rsquo;t even necessary to solve the problem it was supposed to solve (data transfer over an ASCII-only protocol). JSON can encode any Unicode character in plain ASCII, if it needs to, with its escape syntax:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="n">string</span> <span class="o">=</span> <span class="s">&quot;Here&#39;s a snowman: </span><span class="se">\N{SNOWMAN}</span><span class="s">&quot;</span>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+</span><span class='line'><span class="n">Here</span><span class="s">&#39;s a snowman: ☃</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">json</span>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">string</span><span class="p">))</span>
+</span><span class='line'><span class="s">&quot;Here&#39;s a snowman: </span><span class="se">\u2603</span><span class="s">&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Read on for the code, and my recommended approach to decoding unfamiliar text.</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2014/03/30/unicode-deadbeef/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2014/03/30/old-posts-and-a-new-blog/">Old posts and a new blog</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-30T04:48:35-04:00" pubdate data-updated="true">Mar 30<span>th</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>It&rsquo;s kind of been a while since I had a personal blog that I updated. I&rsquo;m
+starting again on <a href="http://octopress.org">Octopress</a>.</p>
+
+<p>Because my previous attempt at a blog was also a static site generated from
+Markdown, just not one as well-planned-out as Octopress, it was actually
+straightforward to port over my old posts. That&rsquo;s why, below here, you&rsquo;ll see
+some posts from 2011.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/09/04/emoji-are-more-common-than-hyphens/">Emoji are more common than hyphens. Is your software ready?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-09-04T00:00:00-04:00" pubdate data-updated="true">Sep 4<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>If you write software that handles text, you should expect to have your fundamental assumptions about how text works shaken up about once per decade.</p>
+
+<p>It’s happening again around now. Suddenly, a large volume of text contains characters that not all software is ready to support. Three years ago, these characters didn’t exist, but they’ve been adopted so quickly that, on Twitter, they’re now more common than hyphens.</p>
+
+<p><a href="http://blog.luminoso.com/2013/09/04/emoji-are-more-common-than-hyphens/">Read more on the Luminoso blog</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2013/08/26/ftfy-fixes-text-for-you-3-dot-0/">ftfy (fixes text for you) version 3.0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-08-26T18:27:44-04:00" pubdate data-updated="true">Aug 26<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>About a year ago, Luminoso blogged about how to ungarble garbled Unicode in a post called <a href="http://blog.luminoso.com/2012/08/20/fix-unicode-mistakes-with-python/">Fixing common Unicode mistakes with Python â€” after they’ve been made</a>. Shortly after that, we released the code in a Python package called <a href="https://github.com/LuminosoInsight/python-ftfy">ftfy</a>.</p>
+
+<p>You have almost certainly seen the kind of problem ftfy fixes. Here’s <a href="http://isabelcastillo.com/international-characters-encoding-fpdf">a shoutout</a> from a developer who found that her database was full of place names such as “BucureÅŸti, Romania” because of someone else’s bug. That’s easy enough to fix:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">ftfy</span> <span class="kn">import</span> <span class="n">fix_text</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">fix_text</span><span class="p">(</span><span class="s">u&#39;BucureÅŸti, Romania&#39;</span><span class="p">))</span>
+</span><span class='line'><span class="n">Bucure</span><span class="err">ş</span><span class="n">ti</span><span class="p">,</span> <span class="n">Romania</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="n">fix_text</span><span class="p">(</span><span class="s">u&#39;Sokalâ€™, Lâ€™vivsâ€™ka Oblastâ€™, Ukraine&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="s">&quot;Sokal&#39;, L&#39;vivs&#39;ka Oblast&#39;, Ukraine&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="http://blog.luminoso.com/2013/08/26/ftfy-fixes-text-for-you-version-3-0/">Read more on the Luminoso blog</a></p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/08/04/super-mao-bros/">Super Mao Bros.</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-08-04T03:18:00-04:00" pubdate data-updated="true">Aug 4<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Last night I fired up the nostalgia machine and decided to play an emulated
+version of Super Mario Bros. 1. It turns out that the ROM was corrupted, which
+would usually make it unplayable&hellip;</p>
+
+<p>&hellip;except SMB1&rsquo;s code is so resilient that that doesn&rsquo;t happen. The usual
+failure mode for a corrupted version of SMB1 is that you start in a fascinating
+level called <a href="http://www.youtube.com/watch?v=WzaOstWfj_0">World 0-1</a>, which
+reuses code from other levels to create a surprisingly playable level in a
+flooded castle. Finishing the level resets the game, though.</p>
+
+<p>So I couldn&rsquo;t play much of SMB1. But playing World 0 got me in the mood to
+experiment with other glitches by deliberately screwing with a game&rsquo;s memory
+(in the way that a Game Genie used to do), leading to a new game I call Super
+Mao Bros.</p>
+
+<p><img src="/images/mario-ow.png"/></p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/08/04/super-mao-bros/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/03/30/baphl-4/">BAPHL 4 post-mortem</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-03-30T03:18:00-04:00" pubdate data-updated="true">Mar 30<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>BAPHL 4 was, of course, the largest puzzle hunt I&rsquo;ve been involved in creating,
+and the first where I&rsquo;ve ended up in charge of making the event happen. It
+seems to have gone very well.</p>
+
+<p>The hunt would not have been nearly as good without our hordes of testsolvers,
+especially the three whole teams that Charles rounded up.  They caught lots of
+mistakes, and lots of puzzles that were unreasonably hard.  We spent much of
+the last week before the hunt cutting puzzles down to size wherever we could,
+and yet the three teams took 8 to 11 hours to solve the Normal Mode (admittedly
+with distractions), prompting us to cut even more.</p>
+
+<p>There were a few cases where we did this by replacing a Hard Mode puzzle with a
+thoroughly-testsolved Normal Mode puzzle, which means that for much of the
+hunt, Normal Mode teams were solving the same puzzles as Hard Mode. This would
+presumably be why only one of the five Normal Mode teams finished. I apologize
+for that part. Normal Mode is a nice goal of BAPHL, but it&rsquo;s hard to do. It
+means you have to calibrate the difficulty of each puzzle twice and testsolve
+two versions of it, and already you can never have enough testsolvers.</p>
+
+<p>On the plus side, the difficulty ended up being a reasonable challenge for the
+24 Hard Mode teams, with the winners finishing in 3 hours, and with at least 14
+of them finishing within the total 7 hours.</p>
+
+<p>The puzzles, in the form that we distributed to people, can be found on
+<a href="http://baphl.org/4/puzzles.html">the BAPHL 4 page</a>.</p>
+
+<p>Here are my behind-the-scenes comments on the individual puzzles. (These have
+substantial spoilers, if you were planning to try the puzzles.)</p>
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/03/30/baphl-4/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/03/01/speln-ncorrector/">The Speln Ncorrector</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-03-01T18:18:00-05:00" pubdate data-updated="true">Mar 1<span>st</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Today I was experimenting with using a machine translation toolkit on problems
+besides translation. My first experiment was to try to make a system that would
+take in a word it hasn&rsquo;t seen before and guess how it was pronounced.</p>
+
+<p>I think I accidentally ran something backwards, because what I got was a system
+that takes in the legitimate pronunciation of a word, and usually outputs a
+creative new spelling that it hasn&rsquo;t seen before.</p>
+
+<p><em>I have created a spelling incorrector.</em></p>
+
+<p>Or, as it would say when I put the CMUDICT pronunciations of these words in:</p>
+
+<blockquote><p>Tude I wuz expermentn wth usin a mhin translaun tulkt on problems besids
+translaun.  M furst experment wuz 2 tri 2 mak a sstm thet wood tak in a
+word t haznt syn byfor and gs hu t wuz pranonst.</p>
+
+<p>I think I axedently ran sumthn bakwards, bkuz wut I gt wuz a sstm thet takz
+in the logitamt prenanseaun v a word, and ugly otputs a creatv nu speln
+thet t haznt syn byfor.</p>
+
+<p>I hav creatd a speln ncerector.</p></blockquote>
+
+<p>I am not kidding. Those are the actual spellings my backwards-wired system
+gives for dictionary pronunciations of those words, including spelling
+&ldquo;usually&rdquo; as &ldquo;ugly&rdquo;, &ldquo;accidentally&rdquo; as &ldquo;axedently&rdquo;, and &ldquo;to&rdquo; as &ldquo;2&rdquo;.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/02/21/confuzzle/">The CONFUZZLE wordlist</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-02-21T23:00:00-05:00" pubdate data-updated="true">Feb 21<span>st</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img src="/images/confuzzle-sample.png" /></p>
+
+<p>There are lots of text files that list the words you can use in word games like
+Scrabble. (Some of them are more accurate than others.) But as far as I know,
+this is the only one that you can print on 17 double-sided sheets of
+letter-size paper.</p>
+
+<p>The words in the list come from the excellent, public-domain ENABLE2K word
+list, compiled by Mendel Cooper. His website is sadly defunct, but the wordlist
+has become a standard for word games and puzzles.</p>
+
+<ul>
+<li>The file: <a href="/downloads/confuzzle.pdf">confuzzle.pdf</a></li>
+<li>LaTeX source: <a href="/downloads/confuzzle.tex">confuzzle.tex</a></li>
+<li>The source wordlist: <a href="/downloads/enable.txt">enable.txt</a></li>
+</ul>
+
+
+<p>Why would you want a wordlist on paper instead of a computer file? The same
+reason you&rsquo;d want to play word games on a board instead of on a computer.
+Sometimes, you&rsquo;d rather face the person you&rsquo;re playing against than have your
+face in a laptop.</p>
+
+<h2>How the list works</h2>
+
+<p>The list only contains words, not their definitions. Still, given that there
+are over 170,000 words in the list, it takes some effort &mdash; beyond just using a
+6-point font &mdash; to fit them on 34 pages.</p>
+
+<p>This economy of printed space is accomplished through a form of human-readable
+compression. When many consecutive words in alphabetical order start with the
+same letters, as they tend to do, they are grouped together like this:</p>
+
+<pre><code>ALLOTYP- e es ic ically ies y
+</code></pre>
+
+<p>The grouping was chosen by an algorithm, not by a lexicographer, so sometimes
+words are grouped in odd ways:</p>
+
+<pre><code>NONSOL- ar id ids ution utions
+</code></pre>
+
+<p>I&rsquo;ve also marked the differences between ENABLE and the more well-known
+standard, the Official Tournament and Club Word List 2 (OWL2). These markings
+are not authoritative, because I don&rsquo;t have an electronic file of OWL2. I
+compiled the differences mainly from <a href="http://www.scrabbleassociation.com/boards/dictionary/octwl2.html">this National Scrabble Association
+page</a>.</p>
+
+<p>Locating the code that chose the groupings will, unfortunately, take a bit of
+hard-drive archaeology. I made the list in 2003, updated it for OWL2 in 2006,
+and updated it manually in 2011 to incorporate the National Scrabble
+Association&rsquo;s errata to OWL2.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  <div class="pagination">
+    
+    <a href="/blog/archives/"> Archives </a>
+    
+  </div>
+</div>
+<aside class="sidebar">
+  
+    <section id="titles">
+  <a href="http://rspeer.github.io" title="rspeer"><img id="logo" src="http://rspeer.github.io/images/OMGHAX.png" /></a>
+  <h1 id="site_title"><a href="http://rspeer.github.io" title="rspeer">rspeer</a></h1>
+  <h3 id="site_subtitle"></h3>
+</section>
+
+<section id="menu">
+  <ul>
+    <li><i class="fa fa-home fa-lg"></i><a href="http://rspeer.github.io"> Home </a></li>
+    <li><i class="fa fa-calendar fa-lg"></i><a href="http://rspeer.github.io/blog/archives/"> Archives </a></li>
+    <li><i class="fa fa-user fa-lg"></i><a href="http://rspeer.github.io/about/"> About </a></li>
+    <li><i class="fa fa-rss fa-lg"></i><a href="http://rspeer.github.io/atom.xml"> Feed </a></li>
+  </ul>
+</section>
+
+<section id="social">
+  
+
+  
+
+  
+
+  
+    <a href="https://github.com/rspeer" title="rspeer"><i class="fa fa-github fa-2x"></i></a>
+  
+
+  
+
+  
+    <a href="https://twitter.com/r_speer" title="r_speer"><i class="fa fa-twitter fa-2x"></i></a>
+  
+</section>
+
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/03/30/unicode-deadbeef/">U+DEADBEEF: Why you shouldn&#8217;t trust arbitrary text encodings</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/03/30/old-posts-and-a-new-blog/">Old posts and a new blog</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/04/emoji-are-more-common-than-hyphens/">Emoji are more common than hyphens. Is your software ready?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/08/26/ftfy-fixes-text-for-you-3-dot-0/">ftfy (fixes text for you) version 3.0</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/08/04/super-mao-bros/">Super Mao Bros.</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/30/baphl-4/">BAPHL 4 post-mortem</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/01/speln-ncorrector/">The Speln Ncorrector</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/02/21/confuzzle/">The CONFUZZLE wordlist</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+    <ul id="category-list"><li><a href='/blog/categories/games'>games (1)</a></li><li><a href='/blog/categories/glitches'>glitches (2)</a></li><li><a href='/blog/categories/luminoso'>luminoso (2)</a></li><li><a href='/blog/categories/meta'>meta (1)</a></li><li><a href='/blog/categories/projects'>projects (1)</a></li><li><a href='/blog/categories/puzzles'>puzzles (1)</a></li><li><a href='/blog/categories/python'>python (2)</a></li><li><a href='/blog/categories/retro-games'>retro games (1)</a></li><li><a href='/blog/categories/software'>software (2)</a></li><li><a href='/blog/categories/unicode'>unicode (3)</a></li><li><a href='/blog/categories/wordplay'>wordplay (2)</a></li></ul>
+</section>
+
+
+
+  
+</aside>
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Rob Speer -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

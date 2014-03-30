@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: meta | rspeer]]></title>
+  <link href="http://rspeer.github.io/blog/categories/meta/atom.xml" rel="self"/>
+  <link href="http://rspeer.github.io/"/>
+  <updated>2014-03-30T19:12:27-04:00</updated>
+  <id>http://rspeer.github.io/</id>
+  <author>
+    <name><![CDATA[Rob Speer]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Old posts and a new blog]]></title>
+    <link href="http://rspeer.github.io/blog/2014/03/30/old-posts-and-a-new-blog/"/>
+    <updated>2014-03-30T04:48:35-04:00</updated>
+    <id>http://rspeer.github.io/blog/2014/03/30/old-posts-and-a-new-blog</id>
+    <content type="html"><![CDATA[<p>It&rsquo;s kind of been a while since I had a personal blog that I updated. I&rsquo;m
+starting again on <a href="http://octopress.org">Octopress</a>.</p>
+
+<p>Because my previous attempt at a blog was also a static site generated from
+Markdown, just not one as well-planned-out as Octopress, it was actually
+straightforward to port over my old posts. That&rsquo;s why, below here, you&rsquo;ll see
+some posts from 2011.</p>
+]]></content>
+  </entry>
+  
+</feed>

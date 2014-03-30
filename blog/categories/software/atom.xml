@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: software | rspeer]]></title>
+  <link href="http://rspeer.github.io/blog/categories/software/atom.xml" rel="self"/>
+  <link href="http://rspeer.github.io/"/>
+  <updated>2014-03-30T19:12:27-04:00</updated>
+  <id>http://rspeer.github.io/</id>
+  <author>
+    <name><![CDATA[Rob Speer]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Old posts and a new blog]]></title>
+    <link href="http://rspeer.github.io/blog/2014/03/30/old-posts-and-a-new-blog/"/>
+    <updated>2014-03-30T04:48:35-04:00</updated>
+    <id>http://rspeer.github.io/blog/2014/03/30/old-posts-and-a-new-blog</id>
+    <content type="html"><![CDATA[<p>It&rsquo;s kind of been a while since I had a personal blog that I updated. I&rsquo;m
+starting again on <a href="http://octopress.org">Octopress</a>.</p>
+
+<p>Because my previous attempt at a blog was also a static site generated from
+Markdown, just not one as well-planned-out as Octopress, it was actually
+straightforward to port over my old posts. That&rsquo;s why, below here, you&rsquo;ll see
+some posts from 2011.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ftfy (fixes text for you) version 3.0]]></title>
+    <link href="http://rspeer.github.io/blog/2013/08/26/ftfy-fixes-text-for-you-3-dot-0/"/>
+    <updated>2013-08-26T18:27:44-04:00</updated>
+    <id>http://rspeer.github.io/blog/2013/08/26/ftfy-fixes-text-for-you-3-dot-0</id>
+    <content type="html"><![CDATA[<p>About a year ago, Luminoso blogged about how to ungarble garbled Unicode in a post called <a href="http://blog.luminoso.com/2012/08/20/fix-unicode-mistakes-with-python/">Fixing common Unicode mistakes with Python â€” after they’ve been made</a>. Shortly after that, we released the code in a Python package called <a href="https://github.com/LuminosoInsight/python-ftfy">ftfy</a>.</p>
+
+<p>You have almost certainly seen the kind of problem ftfy fixes. Here’s <a href="http://isabelcastillo.com/international-characters-encoding-fpdf">a shoutout</a> from a developer who found that her database was full of place names such as “BucureÅŸti, Romania” because of someone else’s bug. That’s easy enough to fix:</p>
+
+<p>```python</p>
+
+<blockquote><blockquote><blockquote><p>from ftfy import fix_text</p>
+
+<p>print(fix_text(u'BucureÅŸti, Romania'))
+Bucureşti, Romania</p>
+
+<p>fix_text(u'Sokalâ€™, Lâ€™vivsâ€™ka Oblastâ€™, Ukraine')
+&ldquo;Sokal', L'vivs'ka Oblast', Ukraine&rdquo;
+```</p></blockquote></blockquote></blockquote>
+
+<p><a href="http://blog.luminoso.com/2013/08/26/ftfy-fixes-text-for-you-version-3-0/">Read more on the Luminoso blog</a></p>
+]]></content>
+  </entry>
+  
+</feed>

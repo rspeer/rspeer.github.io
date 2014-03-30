@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: python | rspeer]]></title>
+  <link href="http://rspeer.github.io/blog/categories/python/atom.xml" rel="self"/>
+  <link href="http://rspeer.github.io/"/>
+  <updated>2014-03-30T19:12:27-04:00</updated>
+  <id>http://rspeer.github.io/</id>
+  <author>
+    <name><![CDATA[Rob Speer]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[U+DEADBEEF: Why you shouldn't trust arbitrary text encodings]]></title>
+    <link href="http://rspeer.github.io/blog/2014/03/30/unicode-deadbeef/"/>
+    <updated>2014-03-30T15:22:50-04:00</updated>
+    <id>http://rspeer.github.io/blog/2014/03/30/unicode-deadbeef</id>
+    <content type="html"><![CDATA[<p>A few months ago I posted a <a href="https://gist.github.com/rspeer/7559750">Gist about ways to totally break Python&rsquo;s Unicode representation</a>, by exploiting <a href="http://bugs.python.org/issue19279">bug #19279</a> in its UTF-7 decoder.</p>
+
+<p>The bug (which is fixed now) is that the encoder doesn&rsquo;t reset its state correctly when it encounters an erroneous UTF-7 sequence. You can make these errors pile up, until they add up to an impossible character, at codepoint U+DEADBEEF.</p>
+
+<p>(While Unicode codepoints are often represented as 32-bit integers, not all 32-bit integers are Unicode codepoints. The highest possible Unicode codepoint is U+10FFFF.)</p>
+
+<p>Once you have this impossible character in a string, you can pass it to standard library functions to cause all sorts of data corruption, including making a SQLite database unreadable.</p>
+
+<p>There&rsquo;s one easy lesson to take from this: keep Python up to date. If you&rsquo;re on Python 2.7.6 or later, you won&rsquo;t encounter this particular bug. But then, this isn&rsquo;t <a href="http://bugs.python.org/issue20538">the last UTF-7 bug</a> in Python.</p>
+
+<p>Here&rsquo;s the more important lesson, though, which applies in any programming language:</p>
+
+<h2>Don&rsquo;t let someone else&rsquo;s data tell your code what to do</h2>
+
+<p>When people initially uncover these encoding bugs, it is often because they are <a href="http://bugs.python.org/issue19279#msg200117">scraping the Web</a>, or e-mails, or some other format where you can tell the recipient what encoding your text is in. There&rsquo;s lots of code out there that will read that metadata and use the appropriate decoder in Python.</p>
+
+<p>This is kind of dangerous. You&rsquo;re letting data you didn&rsquo;t create determine what your code does. If a Web page says it&rsquo;s in UTF-7, it&rsquo;ll use the UTF-7 decoder, which you&rsquo;ve probably never used before. If it says it&rsquo;s in <code>gzip_codec</code> and contains a <a href="https://mail.python.org/pipermail/python-dev/2013-November/130188.html">gzip bomb</a>, boom.</p>
+
+<p>Some of these attacks are theoretical, but there are a few real web pages out there that &mdash; perhaps accidentally &mdash; claim to be in UTF-7 and trigger bug #19279. Really, it shouldn&rsquo;t matter what the Web page you&rsquo;re scraping claims: your code has <em>no business</em> firing up the UTF-7 decoder, which it usually doesn&rsquo;t do, just because some Web page told it to.</p>
+
+<h2>UTF-7 is a vulnerability</h2>
+
+<p>Even if the decoder were bug-free, UTF-7 would be a totally unsuitable encoding for exchanging data. The fact that you can hide ASCII characters as other strings in UTF-7 has been used in <a href="http://nedbatchelder.com/blog/200704/xss_with_utf7.html">a real XSS vulnerability</a> that was only fixed by major Web browsers disabling automatic UTF-7 decoding.</p>
+
+<p><code>
++ADw-script+AD4-alert(+ACc-xss+ACc-)+ADw-+AC8-script+AD4-
+</code></p>
+
+<p>UTF-7 isn&rsquo;t even necessary to solve the problem it was supposed to solve (data transfer over an ASCII-only protocol). JSON can encode any Unicode character in plain ASCII, if it needs to, with its escape syntax:</p>
+
+<p>```python</p>
+
+<blockquote><blockquote><blockquote><p>string = &ldquo;Here&rsquo;s a snowman: \N{SNOWMAN}&rdquo;
+print(string)
+Here&rsquo;s a snowman: ☃</p>
+
+<p>import json
+print(json.dumps(string))
+&ldquo;Here&rsquo;s a snowman: \u2603&rdquo;
+```</p></blockquote></blockquote></blockquote>
+
+<p>Read on for the code, and my recommended approach to decoding unfamiliar text.</p>
+
+<!-- more -->
+
+
+<h2>Make a whitelist of encodings</h2>
+
+<p>Is the solution to blacklist UTF-7, <code>gzip_codec</code>, <code>bzip2_codec</code>, and so on? It would take a lot of research to find out the complete list of encodings that you&rsquo;re better off avoiding. Just at a glance, I see that Python supports HZ, a Chinese encoding with UTF-7-like properties. Do we know what its quirks and vulnerabilities are? In what circumstances would you want to find out?</p>
+
+<p>When you are scraping the Web, accepting just any encoding is absurd. UTF-8 has almost entirely taken over the Internet. There are a few other encodings you&rsquo;ll have to deal with from time to time, but you probably don&rsquo;t have to deal with every kind of ugly data in every language. So perhaps you should <em>whitelist</em> non-UTF-8 encodings when you know you have to decode them.</p>
+
+<p>Here are the encodings that I personally think are used often enough to be safe:</p>
+
+<ul>
+<li><code>ASCII</code> (obviously)</li>
+<li><code>UTF-8</code> (the ASCII-compatible encoding preferred by nearly everything on the Web)</li>
+<li><code>UTF-16</code> (preferred by Windows APIs)</li>
+<li><code>ISO-8859-1</code> as a special case (pretend they said <code>Windows-1252</code>, because that&rsquo;s almost always what people mean when they say &ldquo;ISO-8859-1&rdquo;)</li>
+<li><code>Windows-1250</code> through <code>Windows-1258</code>, <code>ISO-8859-1</code> through <code>ISO-8859-15</code>, and <code>MacRoman</code> (although some of these are terribly obscure, they all use the same code)</li>
+<li><code>cp437</code> (the old IBM character set that&rsquo;s still, to this day, baked into every PC&rsquo;s display hardware)</li>
+</ul>
+
+
+<p>This covers all the easy cases, leaving us with the mess of encodings that China, Japan, and Korea have created and continue to use because they&rsquo;re too proud to adopt UTF-8. If you intend to have solid support for a CJK language, where you&rsquo;ll probably encounter other problems besides just decoding the text, add some more encodings to your whitelist:</p>
+
+<ul>
+<li>If you support Japanese text, you should support <code>Shift-JIS</code> and <code>EUC-JP</code>.</li>
+<li>If you support Korean text, you should support <code>EUC-KR</code>.</li>
+<li>If you support Traditional Chinese text, you should support <code>Big5</code>.</li>
+<li>If you support Simplified Chinese text, you should support <code>GBK</code>.</li>
+</ul>
+
+
+<p>I don&rsquo;t know enough about <code>GB18030</code>, the Chinese-centric alternative to UTF-8. It seems incredibly complex, and although it&rsquo;s the official standard of the People&rsquo;s Republic of China, I get the idea that it&rsquo;s not used in practice that much.</p>
+
+<h2>The U+DEADBEEF code</h2>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span> (deadbeef_character.py)</span> <a href='/downloads/code/deadbeef_character.py'>download</a></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+</pre></td><td class='code'><pre><code class='py'><span class='line'><span class="sd">&quot;&quot;&quot;</span>
+</span><span class='line'><span class="sd">This file contains code that, when run on Python 2.7.5 or earlier, creates</span>
+</span><span class='line'><span class="sd">a string that should not exist: u&#39;\Udeadbeef&#39;. That&#39;s a single &quot;character&quot;</span>
+</span><span class='line'><span class="sd">that&#39;s illegal in Python because it&#39;s outside the valid Unicode range.</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">It then uses it to crash various things in the Python standard library and</span>
+</span><span class='line'><span class="sd">corrupt a database.</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">On Python 3... well, this file is full of syntax errors on Python 3. But</span>
+</span><span class='line'><span class="sd">if you were to change the print statements and byte literals and stuff:</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">* You&#39;d probably see the same bug on Python 3.2.</span>
+</span><span class='line'><span class="sd">* On Python 3.3, you&#39;d just get an error making the string on the first line.</span>
+</span><span class='line'><span class="sd">* On Python 3.3.3, the error even makes sense.</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">On narrow builds of Python, u&#39;\Udeadbeef&#39; gets immediately truncated to</span>
+</span><span class='line'><span class="sd">u&#39;\ubeef&#39;, a totally safe character. (It&#39;s a nonsense syllable in</span>
+</span><span class='line'><span class="sd">Korean.) For once, narrow Python&#39;s half-assed Unicode support has saved you.</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">The relevant bug is: http://bugs.python.org/issue19279</span>
+</span><span class='line'><span class="sd">&quot;&quot;&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Use a bug in the UTF-7 decoder to create a string containing codepoint</span>
+</span><span class='line'><span class="c"># U+DEADBEEF. (Keep in mind that Unicode ends at U+10FFFF.)</span>
+</span><span class='line'><span class="n">deadbeef</span> <span class="o">=</span> <span class="s">&#39;+d,+6t,+vu8-&#39;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;utf-7&#39;</span><span class="p">,</span> <span class="s">&#39;replace&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</span><span class='line'><span class="k">print</span> <span class="nb">repr</span><span class="p">(</span><span class="n">deadbeef</span><span class="p">)</span>
+</span><span class='line'><span class="c"># outputs u&#39;\Udeadbeef&#39;. That&#39;s not a valid string literal.</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">codecs</span>
+</span><span class='line'><span class="k">with</span> <span class="n">codecs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&#39;deadbeef.txt&#39;</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+</span><span class='line'>    <span class="k">print</span> <span class="o">&gt;&gt;</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">deadbeef</span>
+</span><span class='line'><span class="c"># writes a non-UTF-8 file</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">try</span><span class="p">:</span>
+</span><span class='line'>    <span class="k">with</span> <span class="n">codecs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&#39;deadbeef.txt&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+</span><span class='line'>        <span class="k">print</span> <span class="n">infile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</span><span class='line'><span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
+</span><span class='line'>    <span class="k">print</span> <span class="s">&quot;Boom! Broke your text file.&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">re</span>
+</span><span class='line'><span class="k">try</span><span class="p">:</span>
+</span><span class='line'>    <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">u&#39;[A-</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="n">deadbeef</span><span class="p">,</span> <span class="s">u&#39;test&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="k">except</span> <span class="ne">MemoryError</span><span class="p">:</span>
+</span><span class='line'>    <span class="k">print</span> <span class="s">&quot;Boom! Broke your regular expression.&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">sqlite3</span>
+</span><span class='line'><span class="n">db</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&#39;deadbeef.db&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">u&#39;CREATE TABLE deadbeef (id integer primary key, value text)&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">u&#39;INSERT INTO deadbeef (value) VALUES (?)&#39;</span><span class="p">,</span> <span class="s">u&#39;</span><span class="se">\U0001f602</span><span class="s">&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">u&#39;SELECT * FROM deadbeef&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</span><span class='line'><span class="c"># This works fine. I&#39;m just convincing you that SQLite has no problem with</span>
+</span><span class='line'><span class="c"># Unicode itself.</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">u&#39;INSERT INTO deadbeef (value) VALUES (?)&#39;</span><span class="p">,</span> <span class="n">deadbeef</span><span class="p">)</span>
+</span><span class='line'><span class="k">try</span><span class="p">:</span>
+</span><span class='line'>    <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">u&#39;SELECT * FROM deadbeef&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</span><span class='line'><span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">OperationalError</span><span class="p">:</span>
+</span><span class='line'>    <span class="k">print</span> <span class="s">&quot;Boom! Corrupted your database.&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># As a bonus, if you run that SQLite query at the IPython prompt, it gets</span>
+</span><span class='line'><span class="c"># a second error trying to print out the error message.</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ftfy (fixes text for you) version 3.0]]></title>
+    <link href="http://rspeer.github.io/blog/2013/08/26/ftfy-fixes-text-for-you-3-dot-0/"/>
+    <updated>2013-08-26T18:27:44-04:00</updated>
+    <id>http://rspeer.github.io/blog/2013/08/26/ftfy-fixes-text-for-you-3-dot-0</id>
+    <content type="html"><![CDATA[<p>About a year ago, Luminoso blogged about how to ungarble garbled Unicode in a post called <a href="http://blog.luminoso.com/2012/08/20/fix-unicode-mistakes-with-python/">Fixing common Unicode mistakes with Python â€” after they’ve been made</a>. Shortly after that, we released the code in a Python package called <a href="https://github.com/LuminosoInsight/python-ftfy">ftfy</a>.</p>
+
+<p>You have almost certainly seen the kind of problem ftfy fixes. Here’s <a href="http://isabelcastillo.com/international-characters-encoding-fpdf">a shoutout</a> from a developer who found that her database was full of place names such as “BucureÅŸti, Romania” because of someone else’s bug. That’s easy enough to fix:</p>
+
+<p>```python</p>
+
+<blockquote><blockquote><blockquote><p>from ftfy import fix_text</p>
+
+<p>print(fix_text(u'BucureÅŸti, Romania'))
+Bucureşti, Romania</p>
+
+<p>fix_text(u'Sokalâ€™, Lâ€™vivsâ€™ka Oblastâ€™, Ukraine')
+&ldquo;Sokal', L'vivs'ka Oblast', Ukraine&rdquo;
+```</p></blockquote></blockquote></blockquote>
+
+<p><a href="http://blog.luminoso.com/2013/08/26/ftfy-fixes-text-for-you-version-3-0/">Read more on the Luminoso blog</a></p>
+]]></content>
+  </entry>
+  
+</feed>

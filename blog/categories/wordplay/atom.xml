@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: wordplay | rspeer]]></title>
+  <link href="http://rspeer.github.io/blog/categories/wordplay/atom.xml" rel="self"/>
+  <link href="http://rspeer.github.io/"/>
+  <updated>2014-03-30T19:12:27-04:00</updated>
+  <id>http://rspeer.github.io/</id>
+  <author>
+    <name><![CDATA[Rob Speer]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[The Speln Ncorrector]]></title>
+    <link href="http://rspeer.github.io/blog/2011/03/01/speln-ncorrector/"/>
+    <updated>2011-03-01T18:18:00-05:00</updated>
+    <id>http://rspeer.github.io/blog/2011/03/01/speln-ncorrector</id>
+    <content type="html"><![CDATA[<p>Today I was experimenting with using a machine translation toolkit on problems
+besides translation. My first experiment was to try to make a system that would
+take in a word it hasn&rsquo;t seen before and guess how it was pronounced.</p>
+
+<p>I think I accidentally ran something backwards, because what I got was a system
+that takes in the legitimate pronunciation of a word, and usually outputs a
+creative new spelling that it hasn&rsquo;t seen before.</p>
+
+<p><em>I have created a spelling incorrector.</em></p>
+
+<p>Or, as it would say when I put the CMUDICT pronunciations of these words in:</p>
+
+<blockquote><p>Tude I wuz expermentn wth usin a mhin translaun tulkt on problems besids
+translaun.  M furst experment wuz 2 tri 2 mak a sstm thet wood tak in a
+word t haznt syn byfor and gs hu t wuz pranonst.</p>
+
+<p>I think I axedently ran sumthn bakwards, bkuz wut I gt wuz a sstm thet takz
+in the logitamt prenanseaun v a word, and ugly otputs a creatv nu speln
+thet t haznt syn byfor.</p>
+
+<p>I hav creatd a speln ncerector.</p></blockquote>
+
+<p>I am not kidding. Those are the actual spellings my backwards-wired system
+gives for dictionary pronunciations of those words, including spelling
+&ldquo;usually&rdquo; as &ldquo;ugly&rdquo;, &ldquo;accidentally&rdquo; as &ldquo;axedently&rdquo;, and &ldquo;to&rdquo; as &ldquo;2&rdquo;.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[The CONFUZZLE wordlist]]></title>
+    <link href="http://rspeer.github.io/blog/2011/02/21/confuzzle/"/>
+    <updated>2011-02-21T23:00:00-05:00</updated>
+    <id>http://rspeer.github.io/blog/2011/02/21/confuzzle</id>
+    <content type="html"><![CDATA[<p><img src="http://rspeer.github.io/images/confuzzle-sample.png" /></p>
+
+<p>There are lots of text files that list the words you can use in word games like
+Scrabble. (Some of them are more accurate than others.) But as far as I know,
+this is the only one that you can print on 17 double-sided sheets of
+letter-size paper.</p>
+
+<p>The words in the list come from the excellent, public-domain ENABLE2K word
+list, compiled by Mendel Cooper. His website is sadly defunct, but the wordlist
+has become a standard for word games and puzzles.</p>
+
+<ul>
+<li>The file: <a href="/downloads/confuzzle.pdf">confuzzle.pdf</a></li>
+<li>LaTeX source: <a href="/downloads/confuzzle.tex">confuzzle.tex</a></li>
+<li>The source wordlist: <a href="/downloads/enable.txt">enable.txt</a></li>
+</ul>
+
+
+<p>Why would you want a wordlist on paper instead of a computer file? The same
+reason you&rsquo;d want to play word games on a board instead of on a computer.
+Sometimes, you&rsquo;d rather face the person you&rsquo;re playing against than have your
+face in a laptop.</p>
+
+<h2>How the list works</h2>
+
+<p>The list only contains words, not their definitions. Still, given that there
+are over 170,000 words in the list, it takes some effort &mdash; beyond just using a
+6-point font &mdash; to fit them on 34 pages.</p>
+
+<p>This economy of printed space is accomplished through a form of human-readable
+compression. When many consecutive words in alphabetical order start with the
+same letters, as they tend to do, they are grouped together like this:</p>
+
+<pre><code>ALLOTYP- e es ic ically ies y
+</code></pre>
+
+<p>The grouping was chosen by an algorithm, not by a lexicographer, so sometimes
+words are grouped in odd ways:</p>
+
+<pre><code>NONSOL- ar id ids ution utions
+</code></pre>
+
+<p>I&rsquo;ve also marked the differences between ENABLE and the more well-known
+standard, the Official Tournament and Club Word List 2 (OWL2). These markings
+are not authoritative, because I don&rsquo;t have an electronic file of OWL2. I
+compiled the differences mainly from <a href="http://www.scrabbleassociation.com/boards/dictionary/octwl2.html">this National Scrabble Association
+page</a>.</p>
+
+<p>Locating the code that chose the groupings will, unfortunately, take a bit of
+hard-drive archaeology. I made the list in 2003, updated it for OWL2 in 2006,
+and updated it manually in 2011 to incorporate the National Scrabble
+Association&rsquo;s errata to OWL2.</p>
+]]></content>
+  </entry>
+  
+</feed>

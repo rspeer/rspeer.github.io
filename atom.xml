@@ -1,0 +1,849 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[rspeer]]></title>
+  <link href="http://rspeer.github.io/atom.xml" rel="self"/>
+  <link href="http://rspeer.github.io/"/>
+  <updated>2014-03-30T19:12:27-04:00</updated>
+  <id>http://rspeer.github.io/</id>
+  <author>
+    <name><![CDATA[Rob Speer]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[U+DEADBEEF: Why you shouldn't trust arbitrary text encodings]]></title>
+    <link href="http://rspeer.github.io/blog/2014/03/30/unicode-deadbeef/"/>
+    <updated>2014-03-30T15:22:50-04:00</updated>
+    <id>http://rspeer.github.io/blog/2014/03/30/unicode-deadbeef</id>
+    <content type="html"><![CDATA[<p>A few months ago I posted a <a href="https://gist.github.com/rspeer/7559750">Gist about ways to totally break Python&rsquo;s Unicode representation</a>, by exploiting <a href="http://bugs.python.org/issue19279">bug #19279</a> in its UTF-7 decoder.</p>
+
+<p>The bug (which is fixed now) is that the encoder doesn&rsquo;t reset its state correctly when it encounters an erroneous UTF-7 sequence. You can make these errors pile up, until they add up to an impossible character, at codepoint U+DEADBEEF.</p>
+
+<p>(While Unicode codepoints are often represented as 32-bit integers, not all 32-bit integers are Unicode codepoints. The highest possible Unicode codepoint is U+10FFFF.)</p>
+
+<p>Once you have this impossible character in a string, you can pass it to standard library functions to cause all sorts of data corruption, including making a SQLite database unreadable.</p>
+
+<p>There&rsquo;s one easy lesson to take from this: keep Python up to date. If you&rsquo;re on Python 2.7.6 or later, you won&rsquo;t encounter this particular bug. But then, this isn&rsquo;t <a href="http://bugs.python.org/issue20538">the last UTF-7 bug</a> in Python.</p>
+
+<p>Here&rsquo;s the more important lesson, though, which applies in any programming language:</p>
+
+<h2>Don&rsquo;t let someone else&rsquo;s data tell your code what to do</h2>
+
+<p>When people initially uncover these encoding bugs, it is often because they are <a href="http://bugs.python.org/issue19279#msg200117">scraping the Web</a>, or e-mails, or some other format where you can tell the recipient what encoding your text is in. There&rsquo;s lots of code out there that will read that metadata and use the appropriate decoder in Python.</p>
+
+<p>This is kind of dangerous. You&rsquo;re letting data you didn&rsquo;t create determine what your code does. If a Web page says it&rsquo;s in UTF-7, it&rsquo;ll use the UTF-7 decoder, which you&rsquo;ve probably never used before. If it says it&rsquo;s in <code>gzip_codec</code> and contains a <a href="https://mail.python.org/pipermail/python-dev/2013-November/130188.html">gzip bomb</a>, boom.</p>
+
+<p>Some of these attacks are theoretical, but there are a few real web pages out there that &mdash; perhaps accidentally &mdash; claim to be in UTF-7 and trigger bug #19279. Really, it shouldn&rsquo;t matter what the Web page you&rsquo;re scraping claims: your code has <em>no business</em> firing up the UTF-7 decoder, which it usually doesn&rsquo;t do, just because some Web page told it to.</p>
+
+<h2>UTF-7 is a vulnerability</h2>
+
+<p>Even if the decoder were bug-free, UTF-7 would be a totally unsuitable encoding for exchanging data. The fact that you can hide ASCII characters as other strings in UTF-7 has been used in <a href="http://nedbatchelder.com/blog/200704/xss_with_utf7.html">a real XSS vulnerability</a> that was only fixed by major Web browsers disabling automatic UTF-7 decoding.</p>
+
+<figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class=''><span class='line'>+ADw-script+AD4-alert(+ACc-xss+ACc-)+ADw-+AC8-script+AD4-</span></code></pre></td></tr></table></div></figure>
+
+
+<p>UTF-7 isn&rsquo;t even necessary to solve the problem it was supposed to solve (data transfer over an ASCII-only protocol). JSON can encode any Unicode character in plain ASCII, if it needs to, with its escape syntax:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="n">string</span> <span class="o">=</span> <span class="s">&quot;Here&#39;s a snowman: </span><span class="se">\N{SNOWMAN}</span><span class="s">&quot;</span>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">string</span><span class="p">)</span>
+</span><span class='line'><span class="n">Here</span><span class="s">&#39;s a snowman: ☃</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="kn">import</span> <span class="nn">json</span>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">string</span><span class="p">))</span>
+</span><span class='line'><span class="s">&quot;Here&#39;s a snowman: </span><span class="se">\u2603</span><span class="s">&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Read on for the code, and my recommended approach to decoding unfamiliar text.</p>
+
+<!-- more -->
+
+
+<h2>Make a whitelist of encodings</h2>
+
+<p>Is the solution to blacklist UTF-7, <code>gzip_codec</code>, <code>bzip2_codec</code>, and so on? It would take a lot of research to find out the complete list of encodings that you&rsquo;re better off avoiding. Just at a glance, I see that Python supports HZ, a Chinese encoding with UTF-7-like properties. Do we know what its quirks and vulnerabilities are? In what circumstances would you want to find out?</p>
+
+<p>When you are scraping the Web, accepting just any encoding is absurd. UTF-8 has almost entirely taken over the Internet. There are a few other encodings you&rsquo;ll have to deal with from time to time, but you probably don&rsquo;t have to deal with every kind of ugly data in every language. So perhaps you should <em>whitelist</em> non-UTF-8 encodings when you know you have to decode them.</p>
+
+<p>Here are the encodings that I personally think are used often enough to be safe:</p>
+
+<ul>
+<li><code>ASCII</code> (obviously)</li>
+<li><code>UTF-8</code> (the ASCII-compatible encoding preferred by nearly everything on the Web)</li>
+<li><code>UTF-16</code> (preferred by Windows APIs)</li>
+<li><code>ISO-8859-1</code> as a special case (pretend they said <code>Windows-1252</code>, because that&rsquo;s almost always what people mean when they say &ldquo;ISO-8859-1&rdquo;)</li>
+<li><code>Windows-1250</code> through <code>Windows-1258</code>, <code>ISO-8859-1</code> through <code>ISO-8859-15</code>, and <code>MacRoman</code> (although some of these are terribly obscure, they all use the same code)</li>
+<li><code>cp437</code> (the old IBM character set that&rsquo;s still, to this day, baked into every PC&rsquo;s display hardware)</li>
+</ul>
+
+
+<p>This covers all the easy cases, leaving us with the mess of encodings that China, Japan, and Korea have created and continue to use because they&rsquo;re too proud to adopt UTF-8. If you intend to have solid support for a CJK language, where you&rsquo;ll probably encounter other problems besides just decoding the text, add some more encodings to your whitelist:</p>
+
+<ul>
+<li>If you support Japanese text, you should support <code>Shift-JIS</code> and <code>EUC-JP</code>.</li>
+<li>If you support Korean text, you should support <code>EUC-KR</code>.</li>
+<li>If you support Traditional Chinese text, you should support <code>Big5</code>.</li>
+<li>If you support Simplified Chinese text, you should support <code>GBK</code>.</li>
+</ul>
+
+
+<p>I don&rsquo;t know enough about <code>GB18030</code>, the Chinese-centric alternative to UTF-8. It seems incredibly complex, and although it&rsquo;s the official standard of the People&rsquo;s Republic of China, I get the idea that it&rsquo;s not used in practice that much.</p>
+
+<h2>The U+DEADBEEF code</h2>
+
+<figure class='code'><figcaption><span> (deadbeef_character.py)</span> <a href='http://rspeer.github.io/downloads/code/deadbeef_character.py'>download</a></figcaption>
+<div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+<span class='line-number'>38</span>
+<span class='line-number'>39</span>
+<span class='line-number'>40</span>
+<span class='line-number'>41</span>
+<span class='line-number'>42</span>
+<span class='line-number'>43</span>
+<span class='line-number'>44</span>
+<span class='line-number'>45</span>
+<span class='line-number'>46</span>
+<span class='line-number'>47</span>
+<span class='line-number'>48</span>
+<span class='line-number'>49</span>
+<span class='line-number'>50</span>
+<span class='line-number'>51</span>
+<span class='line-number'>52</span>
+<span class='line-number'>53</span>
+<span class='line-number'>54</span>
+<span class='line-number'>55</span>
+<span class='line-number'>56</span>
+<span class='line-number'>57</span>
+<span class='line-number'>58</span>
+<span class='line-number'>59</span>
+<span class='line-number'>60</span>
+<span class='line-number'>61</span>
+</pre></td><td class='code'><pre><code class='py'><span class='line'><span class="sd">&quot;&quot;&quot;</span>
+</span><span class='line'><span class="sd">This file contains code that, when run on Python 2.7.5 or earlier, creates</span>
+</span><span class='line'><span class="sd">a string that should not exist: u&#39;\Udeadbeef&#39;. That&#39;s a single &quot;character&quot;</span>
+</span><span class='line'><span class="sd">that&#39;s illegal in Python because it&#39;s outside the valid Unicode range.</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">It then uses it to crash various things in the Python standard library and</span>
+</span><span class='line'><span class="sd">corrupt a database.</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">On Python 3... well, this file is full of syntax errors on Python 3. But</span>
+</span><span class='line'><span class="sd">if you were to change the print statements and byte literals and stuff:</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">* You&#39;d probably see the same bug on Python 3.2.</span>
+</span><span class='line'><span class="sd">* On Python 3.3, you&#39;d just get an error making the string on the first line.</span>
+</span><span class='line'><span class="sd">* On Python 3.3.3, the error even makes sense.</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">On narrow builds of Python, u&#39;\Udeadbeef&#39; gets immediately truncated to</span>
+</span><span class='line'><span class="sd">u&#39;\ubeef&#39;, a totally safe character. (It&#39;s a nonsense syllable in</span>
+</span><span class='line'><span class="sd">Korean.) For once, narrow Python&#39;s half-assed Unicode support has saved you.</span>
+</span><span class='line'>
+</span><span class='line'><span class="sd">The relevant bug is: http://bugs.python.org/issue19279</span>
+</span><span class='line'><span class="sd">&quot;&quot;&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># Use a bug in the UTF-7 decoder to create a string containing codepoint</span>
+</span><span class='line'><span class="c"># U+DEADBEEF. (Keep in mind that Unicode ends at U+10FFFF.)</span>
+</span><span class='line'><span class="n">deadbeef</span> <span class="o">=</span> <span class="s">&#39;+d,+6t,+vu8-&#39;</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s">&#39;utf-7&#39;</span><span class="p">,</span> <span class="s">&#39;replace&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+</span><span class='line'><span class="k">print</span> <span class="nb">repr</span><span class="p">(</span><span class="n">deadbeef</span><span class="p">)</span>
+</span><span class='line'><span class="c"># outputs u&#39;\Udeadbeef&#39;. That&#39;s not a valid string literal.</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">codecs</span>
+</span><span class='line'><span class="k">with</span> <span class="n">codecs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&#39;deadbeef.txt&#39;</span><span class="p">,</span> <span class="s">&#39;w&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">outfile</span><span class="p">:</span>
+</span><span class='line'>    <span class="k">print</span> <span class="o">&gt;&gt;</span> <span class="n">outfile</span><span class="p">,</span> <span class="n">deadbeef</span>
+</span><span class='line'><span class="c"># writes a non-UTF-8 file</span>
+</span><span class='line'>
+</span><span class='line'><span class="k">try</span><span class="p">:</span>
+</span><span class='line'>    <span class="k">with</span> <span class="n">codecs</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="s">&#39;deadbeef.txt&#39;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s">&#39;utf-8&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">infile</span><span class="p">:</span>
+</span><span class='line'>        <span class="k">print</span> <span class="n">infile</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</span><span class='line'><span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
+</span><span class='line'>    <span class="k">print</span> <span class="s">&quot;Boom! Broke your text file.&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">re</span>
+</span><span class='line'><span class="k">try</span><span class="p">:</span>
+</span><span class='line'>    <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="s">u&#39;[A-</span><span class="si">%s</span><span class="s">]&#39;</span> <span class="o">%</span> <span class="n">deadbeef</span><span class="p">,</span> <span class="s">u&#39;test&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="k">except</span> <span class="ne">MemoryError</span><span class="p">:</span>
+</span><span class='line'>    <span class="k">print</span> <span class="s">&quot;Boom! Broke your regular expression.&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="kn">import</span> <span class="nn">sqlite3</span>
+</span><span class='line'><span class="n">db</span> <span class="o">=</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">&#39;deadbeef.db&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">u&#39;CREATE TABLE deadbeef (id integer primary key, value text)&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">u&#39;INSERT INTO deadbeef (value) VALUES (?)&#39;</span><span class="p">,</span> <span class="s">u&#39;</span><span class="se">\U0001f602</span><span class="s">&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">u&#39;SELECT * FROM deadbeef&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</span><span class='line'><span class="c"># This works fine. I&#39;m just convincing you that SQLite has no problem with</span>
+</span><span class='line'><span class="c"># Unicode itself.</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">u&#39;INSERT INTO deadbeef (value) VALUES (?)&#39;</span><span class="p">,</span> <span class="n">deadbeef</span><span class="p">)</span>
+</span><span class='line'><span class="k">try</span><span class="p">:</span>
+</span><span class='line'>    <span class="n">db</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s">u&#39;SELECT * FROM deadbeef&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+</span><span class='line'><span class="k">except</span> <span class="n">sqlite3</span><span class="o">.</span><span class="n">OperationalError</span><span class="p">:</span>
+</span><span class='line'>    <span class="k">print</span> <span class="s">&quot;Boom! Corrupted your database.&quot;</span>
+</span><span class='line'>
+</span><span class='line'><span class="c"># As a bonus, if you run that SQLite query at the IPython prompt, it gets</span>
+</span><span class='line'><span class="c"># a second error trying to print out the error message.</span>
+</span></code></pre></td></tr></table></div></figure>
+
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Old posts and a new blog]]></title>
+    <link href="http://rspeer.github.io/blog/2014/03/30/old-posts-and-a-new-blog/"/>
+    <updated>2014-03-30T04:48:35-04:00</updated>
+    <id>http://rspeer.github.io/blog/2014/03/30/old-posts-and-a-new-blog</id>
+    <content type="html"><![CDATA[<p>It&rsquo;s kind of been a while since I had a personal blog that I updated. I&rsquo;m
+starting again on <a href="http://octopress.org">Octopress</a>.</p>
+
+<p>Because my previous attempt at a blog was also a static site generated from
+Markdown, just not one as well-planned-out as Octopress, it was actually
+straightforward to port over my old posts. That&rsquo;s why, below here, you&rsquo;ll see
+some posts from 2011.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Emoji are more common than hyphens. Is your software ready?]]></title>
+    <link href="http://rspeer.github.io/blog/2013/09/04/emoji-are-more-common-than-hyphens/"/>
+    <updated>2013-09-04T00:00:00-04:00</updated>
+    <id>http://rspeer.github.io/blog/2013/09/04/emoji-are-more-common-than-hyphens</id>
+    <content type="html"><![CDATA[<p>If you write software that handles text, you should expect to have your fundamental assumptions about how text works shaken up about once per decade.</p>
+
+<p>It’s happening again around now. Suddenly, a large volume of text contains characters that not all software is ready to support. Three years ago, these characters didn’t exist, but they’ve been adopted so quickly that, on Twitter, they’re now more common than hyphens.</p>
+
+<p><a href="http://blog.luminoso.com/2013/09/04/emoji-are-more-common-than-hyphens/">Read more on the Luminoso blog</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[ftfy (fixes text for you) version 3.0]]></title>
+    <link href="http://rspeer.github.io/blog/2013/08/26/ftfy-fixes-text-for-you-3-dot-0/"/>
+    <updated>2013-08-26T18:27:44-04:00</updated>
+    <id>http://rspeer.github.io/blog/2013/08/26/ftfy-fixes-text-for-you-3-dot-0</id>
+    <content type="html"><![CDATA[<p>About a year ago, Luminoso blogged about how to ungarble garbled Unicode in a post called <a href="http://blog.luminoso.com/2012/08/20/fix-unicode-mistakes-with-python/">Fixing common Unicode mistakes with Python â€” after they’ve been made</a>. Shortly after that, we released the code in a Python package called <a href="https://github.com/LuminosoInsight/python-ftfy">ftfy</a>.</p>
+
+<p>You have almost certainly seen the kind of problem ftfy fixes. Here’s <a href="http://isabelcastillo.com/international-characters-encoding-fpdf">a shoutout</a> from a developer who found that her database was full of place names such as “BucureÅŸti, Romania” because of someone else’s bug. That’s easy enough to fix:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='python'><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="kn">from</span> <span class="nn">ftfy</span> <span class="kn">import</span> <span class="n">fix_text</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">fix_text</span><span class="p">(</span><span class="s">u&#39;BucureÅŸti, Romania&#39;</span><span class="p">))</span>
+</span><span class='line'><span class="n">Bucure</span><span class="err">ş</span><span class="n">ti</span><span class="p">,</span> <span class="n">Romania</span>
+</span><span class='line'>
+</span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="n">fix_text</span><span class="p">(</span><span class="s">u&#39;Sokalâ€™, Lâ€™vivsâ€™ka Oblastâ€™, Ukraine&#39;</span><span class="p">)</span>
+</span><span class='line'><span class="s">&quot;Sokal&#39;, L&#39;vivs&#39;ka Oblast&#39;, Ukraine&quot;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p><a href="http://blog.luminoso.com/2013/08/26/ftfy-fixes-text-for-you-version-3-0/">Read more on the Luminoso blog</a></p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[Super Mao Bros.]]></title>
+    <link href="http://rspeer.github.io/blog/2011/08/04/super-mao-bros/"/>
+    <updated>2011-08-04T03:18:00-04:00</updated>
+    <id>http://rspeer.github.io/blog/2011/08/04/super-mao-bros</id>
+    <content type="html"><![CDATA[<p>Last night I fired up the nostalgia machine and decided to play an emulated
+version of Super Mario Bros. 1. It turns out that the ROM was corrupted, which
+would usually make it unplayable&hellip;</p>
+
+<p>&hellip;except SMB1&rsquo;s code is so resilient that that doesn&rsquo;t happen. The usual
+failure mode for a corrupted version of SMB1 is that you start in a fascinating
+level called <a href="http://www.youtube.com/watch?v=WzaOstWfj_0">World 0-1</a>, which
+reuses code from other levels to create a surprisingly playable level in a
+flooded castle. Finishing the level resets the game, though.</p>
+
+<p>So I couldn&rsquo;t play much of SMB1. But playing World 0 got me in the mood to
+experiment with other glitches by deliberately screwing with a game&rsquo;s memory
+(in the way that a Game Genie used to do), leading to a new game I call Super
+Mao Bros.</p>
+
+<p><img src="http://rspeer.github.io/images/mario-ow.png"/></p>
+
+<!-- more -->
+
+
+<p>&ldquo;Mao&rdquo; is a card game that I played a lot in high school. One feature of the
+game is that the winner of each round adds or changes a rule, but they don&rsquo;t
+tell anyone what the new rule is &mdash; they just penalize people for breaking it.
+That&rsquo;s why it&rsquo;s named after a crazed dictator.</p>
+
+<p>Super Mao Bros. is kind of similar, except it&rsquo;s you against a video game.
+Here&rsquo;s how you play:</p>
+
+<ul>
+<li>Get a ROM of some NES game with distinct levels. I used Super Mario Bros. 3
+(as my SMB1 was clearly glitched enough already). Super NES games aren&rsquo;t an
+option; they have enough memory that you&rsquo;ll probably never see any tangible
+differences.</li>
+<li>Play the game in an emulator that lets you enter Game Genie codes during the
+game. I use <a href="http://mednafen.sourceforge.net/">mednafen</a> for this purpose &mdash;
+and what&rsquo;s particularly nice is that it will treat any string of 6 letters as
+a valid code.</li>
+<li>Every time you beat a level, <em>save your state</em>, then make up an arbitrary
+code and add it as a Game Genie code. (Memorable 6-letter words are best,
+because you&rsquo;ll need all the help you can get keeping track of them.) For
+example, you might add a new code named &ldquo;FLOWER&rdquo; whose value is &ldquo;FLOWER&rdquo;.
+The point is you have no idea what it will do to the game.</li>
+<li>If the game crashes, restore your save state, figure out which code crashed
+it, and replace that code with another one.</li>
+<li>If you die, don&rsquo;t reload (that&rsquo;s cheating!). But you may still choose to
+replace a code with a different one. There are many codes that won&rsquo;t crash
+the game, but do make levels unwinnable.</li>
+</ul>
+
+
+<p>I&rsquo;ve been having a lot of fun with this. I played a game where I had about 40
+playable codes going, and I got as far as World 4-1. I had to continue
+several times in World 3, because World 3 is already a bitch, my 20 years of
+muscle memory was no help with the new game mechanics, and the game was now
+inherently harder as well.</p>
+
+<p>You&rsquo;ll find lots of lists of Game Genie codes out there on the Web, of course
+&mdash; both from people who want to cheat to make a game easier, and people who
+want to make it as glitchy as possible. But many of the codes I came across at
+random occupy an interesting middle ground of <em>slight</em> changes to the game that
+remain playable. I&rsquo;ll list some of my favorites (which may be inaccurate, as
+sometimes it&rsquo;s hard to tell which code does what).</p>
+
+<ul>
+<li>RUSSIA: objects that fall off the screen, including dead enemies, might
+<em>trampoline back onto it</em>. You can kick a turtle shell into a pit and it
+might bounce out of the pit and kill you. This has an effect of making Hammer
+Bros. encounters on the map very dangerous, as they might refuse to die.
+Also, some freaky thing hovers in the air just behind your head no
+matter which way you&rsquo;re facing, much as described in They Might Be Giants&#8217;
+&ldquo;Where Your Eyes Don&rsquo;t Go&rdquo;.</li>
+<li>CHAPEL: every level starts out totally graphically corrupted, but when you
+move, normal graphics scroll onto the screen. This one is playable &mdash; the
+actual gameplay doesn&rsquo;t change &mdash; but it&rsquo;s <em>hard</em>, because you have to play
+certain parts blind.</li>
+<li>FLAVOR: changes the notes in the music. The music becomes much more
+monotonous, but somehow remains mostly tonal.</li>
+<li>MARKET: when you move onto a level on the world map, you can&rsquo;t move off of
+it; you have to play it. <em>Except</em> that you can miraculously skip over
+level 3-8, the much-loathed &ldquo;fish eats you&rdquo; level, if you move the right way!</li>
+<li>BANKSY: when you die, the game crashes with a loud sudden noise.
+Not recommended, but I&rsquo;m amused at how it&rsquo;s subtler and meaner than the
+codes that just instantly crash the game.</li>
+<li>PIRATE: The best one. A chunk of each level gets rearranged vertically,
+as if it were hit by an earthquake.
+I haven&rsquo;t seen this make a level unplayable, but I have seen it make levels
+where you have to find a very different path to the finish.</li>
+</ul>
+
+
+<p><img src="http://rspeer.github.io/images/OMGHAX.png"/><br><em>Arrrr. We be rearrangin&#8217; ye levels, matey.</em></p>
+
+<p><img src="http://rspeer.github.io/images/MARKET.png"/><br><em>This is more playable than it looks.</em></p>
+
+<p>Mario&rsquo;s quest came to an end when physics simply stopped working in World 4,
+and no amount of disabling cheats and reloading would put it back. The memory
+had already been permanently corrupted, presumably. That&rsquo;s okay &mdash; next time
+I&rsquo;ll just warp to World 4.</p>
+
+<p>I kind of wish I had recorded a video of this, but that would be hard to do.
+Anyway, there are tons of YouTube videos of glitched and hacked Mario games out
+there; the unique experience here is actually playing the game, and trying to
+make progress in a game that keeps changing under you.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[BAPHL 4 post-mortem]]></title>
+    <link href="http://rspeer.github.io/blog/2011/03/30/baphl-4/"/>
+    <updated>2011-03-30T03:18:00-04:00</updated>
+    <id>http://rspeer.github.io/blog/2011/03/30/baphl-4</id>
+    <content type="html"><![CDATA[<p>BAPHL 4 was, of course, the largest puzzle hunt I&rsquo;ve been involved in creating,
+and the first where I&rsquo;ve ended up in charge of making the event happen. It
+seems to have gone very well.</p>
+
+<p>The hunt would not have been nearly as good without our hordes of testsolvers,
+especially the three whole teams that Charles rounded up.  They caught lots of
+mistakes, and lots of puzzles that were unreasonably hard.  We spent much of
+the last week before the hunt cutting puzzles down to size wherever we could,
+and yet the three teams took 8 to 11 hours to solve the Normal Mode (admittedly
+with distractions), prompting us to cut even more.</p>
+
+<p>There were a few cases where we did this by replacing a Hard Mode puzzle with a
+thoroughly-testsolved Normal Mode puzzle, which means that for much of the
+hunt, Normal Mode teams were solving the same puzzles as Hard Mode. This would
+presumably be why only one of the five Normal Mode teams finished. I apologize
+for that part. Normal Mode is a nice goal of BAPHL, but it&rsquo;s hard to do. It
+means you have to calibrate the difficulty of each puzzle twice and testsolve
+two versions of it, and already you can never have enough testsolvers.</p>
+
+<p>On the plus side, the difficulty ended up being a reasonable challenge for the
+24 Hard Mode teams, with the winners finishing in 3 hours, and with at least 14
+of them finishing within the total 7 hours.</p>
+
+<p>The puzzles, in the form that we distributed to people, can be found on
+<a href="http://baphl.org/4/puzzles.html">the BAPHL 4 page</a>.</p>
+
+<p>Here are my behind-the-scenes comments on the individual puzzles. (These have
+substantial spoilers, if you were planning to try the puzzles.)</p>
+
+<!-- more -->
+
+
+<h2>Round 1</h2>
+
+<h3>E-Z Does It (Adam Hesterberg, substantially modified by me)</h3>
+
+<p>This puzzle started as a much longer puzzle named &ldquo;Easy Enigma&rdquo;, where the
+answers to a bunch of clues would turn out to start with two letter sounds. I
+shortened it, especially because I wanted a puzzle there that was truly easy so
+teams could unlock round 2.</p>
+
+<p>For a while, its title was &ldquo;Easy Does It&rdquo;, but many testsolvers were still not
+finding it easy, so finally we changed the title to the one that hits you over
+the head with the mechanism.</p>
+
+<h3>Beginnings and Ends (Bryce Herdt)</h3>
+
+<p>We were worried about this puzzle&rsquo;s difficulty for a while. We had
+testsolved several versions of it that seemed to be just a bit too hard for
+BAPHL, having clues that were unordered within each line, as well as harder
+clues such as &ldquo;Silly person&rdquo; cluing GOOFBALL. But we got the puzzle into a
+reasonably finished state several days before the hunt.</p>
+
+<h3>Bit by Bit (Amos Eshel)</h3>
+
+<p>We had a <em>very</em> hard time getting the difficulty right on this one. We must
+have gone through at least 10 versions of the puzzle, oscillating between far
+too hard and far too easy. We were still worried about the hard version on
+Thursday night, and getting it testsolved (by a non-native speaker of English,
+who found it very hard and time-consuming) was only slightly reassuring. And
+yet in the hunt it worked out fine.</p>
+
+<h3>The Chase (Catherine Havasi and me)</h3>
+
+<p>This was our least-testsolved puzzle, because it required being on site. The
+major glitch was that the clue to look for &ldquo;the lightning man&rdquo; in the Harvard
+Bookstore, which was supposed to lead you to a biography of Samuel Morse,
+simply didn&rsquo;t work. Some teams didn&rsquo;t encounter the problem because they had
+already solved the puzzle by that point &mdash; but those are the stronger teams. So
+this puzzle had an unfortunate flaw that only slowed down the teams who were
+already behind.</p>
+
+<p>To make matters worse, once teams had the clue to use Morse code, they would
+likely look at the Morse code chart in the intro packet, where I had mistyped
+the code for the letter U.</p>
+
+<p>We had tried to actually order a copy of The Lightning Man and get the Harvard
+Bookstore to put it in their window, but they brushed us off. I tried and
+failed to find another nearby way to clue Morse.  Finally, I just had the
+instruction point people to the catalog computer in the Harvard Bookstore. I
+checked that the computer would give you the book if you searched for
+&ldquo;lightning man&rdquo;. I checked again on their website, which I thought used the
+same catalog, on Friday. In the 15 minutes I had to spare on Saturday morning,
+I checked most of the route again, but I skipped the end, knowing that most of
+its clues were literally carved in stone. But that meant I also skipped the
+bookstore.</p>
+
+<p>And that&rsquo;s why, if you used the Harvard Bookstore&rsquo;s catalog in person on
+Saturday, you turned out to get some unrelated book. It&rsquo;s a law of the
+Universe: the one part of your puzzle you don&rsquo;t check will be dead wrong.</p>
+
+<h3>Totem (Jason Alonso and me)</h3>
+
+<p>Being the final metapuzzle, this puzzle was written and testsolved
+approximately five months ago. We made one change to it since then, which was
+to add the L to the middle hex of the puzzle.</p>
+
+<p>Originally, we intended for the radii of the hexagon to give you six-letter
+combinations that give unique eight-letter words when you add letters to the
+front and back, all of which happened to end in L so that they could share the
+middle hex.  Testsolvers didn&rsquo;t actually have much trouble finding these. But
+later, testsolvers who tried the puzzle with incomplete information tended to
+try to use the L in their answer (it&rsquo;s clued <em>six times</em>, so it&rsquo;s probably
+important!). So we put it in the puzzle, making it easier. Not that that&rsquo;s a
+bad thing.</p>
+
+<p>I don&rsquo;t know why I clued &ldquo;ESOTERIC&rdquo; by the fact that it has an obscure anagram
+(COTERIES). A bonus for Scrabble players? Pure sadism? But people seemed to be
+able to deduce which word could be anagrammed anyway, which was my hope.</p>
+
+<p>Normal-mode solvers got all the word lengths marked on their hex grid, which
+for hard-mode solvers would have been a dangerous amount of information. It
+enables many, many opportunities for backsolving &mdash; and in fact, one of our
+normal-mode testsolving teams managed to backsolve the entire middle meta from
+Totem! But I actually think that&rsquo;s a good thing to give to less experienced
+teams, so they can experience the joy of backsolving.</p>
+
+<h2>Round 2</h2>
+
+<h3>Keeping Tabs (Sam Trabucco)</h3>
+
+<p>Sam sprung this puzzle on me when I thought he
+was going to give me a different one, and that&rsquo;s great, because I consider it
+to be the most original puzzle idea in our whole hunt. It&rsquo;s elegant in an
+unconventional way despite being chock full of red herrings.</p>
+
+<p>I didn&rsquo;t really get to find out how teams reacted to it during BAPHL, but I
+remember having people test-solve it in my living room while I went off to edit
+more puzzles, and suddenly hearing a chorus of &ldquo;OHHHHHH&rdquo;. That&rsquo;s a good sign.</p>
+
+<h3>Something Isn&rsquo;t Right (Charles Steinhardt)</h3>
+
+<p>A familiar puzzle type, but one that has lots of room for variation, and which
+tends to be fun both to write and to solve.  Making the puzzle was Charles&rsquo;s
+idea, and we did it in the last week when we found ourselves a puzzle short,
+despite that we then needed to find a whole lot of testsolvers to find false
+positives in it.</p>
+
+<p>We swapped its answer with another puzzle when we found that VIEW is really
+hard to clue with five words, and its current answer can be <em>made</em> of five
+words, as long as one of them is allowed to be extremely obsolete. (&ldquo;Do me
+hangen by the hals.&rdquo; &mdash;Chaucer)</p>
+
+<h3>We Have To Go Deeper (Glenn Willen)</h3>
+
+<p>This puzzle originally came with almost none of the helpful markings that show
+you your options for moving from one level to another &ndash; those were only in the
+normal version. But testsolvers really liked the puzzle once it had them, so
+the hard version got them, too. The extraction also used to be considerably
+more complicated than it is now.</p>
+
+<p>The puzzle still took many teams a bit of time, even though Glenn thought
+we were turning it into the easiest puzzle in the hunt.</p>
+
+<h3>The Futoshiki Kick (Charles)</h3>
+
+<p>Should I admit this? I&rsquo;ll admit this. This meta was written two days before the
+hunt. In fact, it was written <em>during</em> the complete testsolving run.</p>
+
+<p>Amos had written an interesting metapuzzle that plugged every answer into a
+<em>different</em> logic puzzle, so that you had to solve most of seven logic puzzles,
+with a hidden twist as well, to get the answer. Once I saw how long we were
+running, though, I decided quite unilaterally that the puzzle containing seven
+other puzzles had to go, even though it was a metapuzzle. Sorry about that,
+Amos.</p>
+
+<p>So then we needed a metapuzzle, written really fast, that used seven answers
+that already existed.  I asked Charles, and he delivered.  Fortunately, the
+constraint on the answers &mdash; that they were all different lengths after you
+perform puzzle-ception &mdash; was still helpful.</p>
+
+<p>That&rsquo;s why the mechanism for inputting answers into the metapuzzle had to be
+that messy double-crostic pyramid thing combined with a decoding table.
+But despite that part, I think the puzzle worked well. And it&rsquo;s interesting
+that it was a metapuzzle that tells you almost exactly what to do, and yet
+preserves the essential feature that you&rsquo;re more likely to solve it as you get
+more answers.</p>
+
+<p>Incidentally, because you read the answer from the 1s through 7s in the seven
+rows (the one instruction the puzzle doesn&rsquo;t give you), that makes the puzzle
+possibly solvable as a drop quote when you have none of the answers. An ugly
+7x7 drop quote without spaces, but it probably helps that it starts with &ldquo;THE
+ANSWER&rdquo;. I&rsquo;m glad nobody solved it this way (that I know of). I think one team
+might have been trying to do it, though, because they called in &ldquo;DISCOVER&rdquo;
+followed by &ldquo;SUPER DISCOVER&rdquo;.</p>
+
+<h2>Round 3</h2>
+
+<h3>Dilation (Derek Kisman)</h3>
+
+<p>I dropped the ball on this puzzle for quite a while, letting it sit in my inbox
+un-testsolved for months. A couple of weeks before the hunt, I found out that
+the puzzle in my inbox was damn near impossible. But Derek managed to adjust
+the difficulty until we had reasonable versions of it for both hard mode and
+normal mode.</p>
+
+<p>Apparently, many solvers knew or could infer what a GTO is. That&rsquo;s good. I
+didn&rsquo;t understand that clue at all.</p>
+
+<p>At some point in making the final copies, I got confused and thought &ldquo;exalt&rdquo;
+made the obscure word UPRAISE from UPBRAIDS, instead of PRAISE. The normal
+version ended up with six blanks and the hard version with seven. A silly way
+for the hard version to become harder, but it doesn&rsquo;t seem to have tripped
+anyone up.</p>
+
+<h3>Paint by Letters (Ben Aisen)</h3>
+
+<p>Some people liked this puzzle, and some people really, really hated it. No
+knock to Ben, who got us a very flexible puzzle on short notice that I for one
+enjoyed.  I happen to like convoluted liar puzzles, but I can see why it would
+cause frustration: there are many opportunities to get an answer that&rsquo;s very
+subtly wrong, and when you get one of those, you go to the effort of filling in
+the grid and you get nothing for your effort.</p>
+
+<p>I had to basically argue with a team over the phone about this puzzle at one
+point: they were claiming that the puzzle was broken because they had a valid
+solution that didn&rsquo;t give them an answer, I was trying to point out the
+contradiction in their solution, and they were having trouble understanding
+what I was saying because I had to convey something like &ldquo;But then &lsquo;N and C are
+false&rsquo; is <em>false</em>&rdquo;, and you can&rsquo;t hear quotation marks over the phone.</p>
+
+<p>The advantage of this puzzle was that it could be adapted to basically any
+answer. (Not necessarily nicely, though. When the answer was FEDERAL AIR
+MARSHALS, we had it make a phone number to call for the answer instead, but
+even that ultimately required too large of a grid.)</p>
+
+<p>As an editor, I should not have let statement A stay in the puzzle. It&rsquo;s an
+instruction. If it&rsquo;s a claim that can be true or false, then you can suppose
+it&rsquo;s false, and then you can&rsquo;t really say you&rsquo;ve found a contradiction because
+the classical logic you would use to find a contradiction has gone poof.</p>
+
+<p>I assume Ben&rsquo;s reasoning was that A must be true because it is implicitly true
+of every logic puzzle. But if it&rsquo;s false, it&rsquo;s a non-logic puzzle. This all
+gets very philosophical, but in a way the puzzle has two solutions, and one of
+them is to not solve it. You don&rsquo;t normally solve a puzzle by not solving it,
+but this puzzle effectively mentions the possibility right up front.</p>
+
+<p>You might even suppose that there would be a reason for the puzzle to have no
+solution &mdash; perhaps that is part of the &ldquo;puzzle-ception&rdquo; you have to perform,
+or perhaps the instructions are a big red herring, hiding another puzzle within
+them. The flavortext I added about paradoxes (because Arthur says &ldquo;paradox&rdquo;
+repeatedly in the movie) didn&rsquo;t give people confidence that logic would apply
+to the puzzle, either.</p>
+
+<p>To change the topic, I had fun choosing the supposedly changeable letters here.
+If you try to perform puzzle-ception, you get statements including &ldquo;The letters
+in ETOSP are HERE&rdquo;, which I would call true, and &ldquo;This puzzle contains as many
+DISAPPOINTments as a statue in Harvard Yard&rdquo;, which would hopefully clue you in
+that you&rsquo;ve got the wrong puzzle.</p>
+
+<h3>Zero Gravity (me)</h3>
+
+<p>This was my favorite puzzle to write. I hope solvers enjoyed it too. I think I
+heard from some who don&rsquo;t like cryptarithms and therefore found it infuriating;
+I had it testsolved by someone who likes cryptarithms and thought it was great.</p>
+
+<p>I had a team call about the fact that they couldn&rsquo;t distinguish the Ns and Zs
+in sections 7 and 10. I replied with &ldquo;Yes, those are both Ns and Zs. I&rsquo;m
+sorry.&rdquo; Then I realized I could have been misinterpreted and called back:</p>
+
+<p>&ldquo;I&rsquo;m not actually sorry. It&rsquo;s part of the puzzle and I&rsquo;m quite happy about it,
+in fact.&rdquo;</p>
+
+<p>&ldquo;We know what you meant.&rdquo;</p>
+
+<p>There actually is a unique solution to the Ns and Zs, up to an arbitrary swap
+of two 4s and two 2s which doesn&rsquo;t change the answer.</p>
+
+<h3>Messing with Geometry (me)</h3>
+
+<p>The fact that this puzzle had to be the keystone of the entire hunt was quite
+terrifying, for a while.</p>
+
+<p>I started out with the constraint that I had to make a puzzle with two
+versions, whose answers are similar-looking but very different. I also knew I
+wanted to have a puzzle that referred to the Inception scene where Ariadne
+folds up city streets into a cube.</p>
+
+<p>That led to this puzzle idea, which seemed like it might be too constrained to
+create, but I was elated to find that the overlaps between three answer words
+and geometric words &mdash; in very particular places on the cube &mdash; would lead to
+the answer changes I was looking for.</p>
+
+<p>And then began the unexpectedly harder task of writing the rest of the puzzle
+in a way that was solvable. The original version of this puzzle did not even
+tell people they were looking for geometric shapes; it only hinted at it in the
+title. I had testsolvers who managed that, remarkably, but I also had
+testsolvers who never picked up on that and just found all kinds of crazy
+dictionary words. It also did not say that the words had to be non-overlapping;
+I had assumed that would make itself clear when you found the right words,
+of course raising the question of what happens when you find the wrong ones.</p>
+
+<p>Originally, I also had separate &ldquo;hard&rdquo; and &ldquo;normal&rdquo; versions, where only the
+&ldquo;normal&rdquo; version had the board surrounded by a bank of possible shapes to use.
+I felt at first like that weakened the puzzle &mdash; it was essential that you
+wouldn&rsquo;t use all the shapes, because there was another version of the puzzle
+with different shapes, but this seemed to make it a bit too obvious that this
+<em>was</em> the puzzle with another version.</p>
+
+<p>It took me far too long to realize that the hard version of the puzzle was
+broken.  The correct process of solving could get you to a state that didn&rsquo;t
+spell an answer if you were unlucky.</p>
+
+<p>One problem, pointed out to me long before by Amos, was that the cubes in
+MAGNETOSPHERE (in the modified version of the puzzle) do not just spell the
+word SPHERE; they also spell HEPTAGON or SEPTAGON, whichever one you think is
+the name of the seven-sided shape. There was no way to rearrange MAGNETOSPHERE,
+within the constraints of the puzzle, to prevent this. I hand-waved this away
+by saying that no reasonable solver would prefer to take HEPTAGON over SPHERE,
+and even if they did they should eventually find that PENTAGON/SPHERE uses more
+cubes than HEPTAGON, and that makes it more &ldquo;answery&rdquo;. In some wibbly-wobbly
+way.</p>
+
+<p>Much later, testsolvers found that letters in ELLIPSE, CURVE, and the A from
+the answer could spell SPIRAL. This was actually found by testsolvers in
+Normal Mode who had the shape bank, because the shape I had originally
+chosen as a &ldquo;curve&rdquo; could in fact be seen as a segment as a spiral.</p>
+
+<p>But up until the day before BAPHL, I was still just trying to rearrange and
+re-rearrange the board until I could make a &ldquo;hard&rdquo; version with no shape bank
+and no red herrings. Then I had an emergency last-minute testsolver try it, and
+one of the first things he said was &ldquo;Seriously? Septagon?&rdquo; The next thing he
+found was SPIRAL cropping up somewhere different. So that was it for that
+version of the puzzle.</p>
+
+<p>I hastily replaced it with the more-testsolved &ldquo;normal&rdquo; version. If it made it
+too clear that it was the modifiable puzzle, that was not something to be
+concerned about anymore, as by then we were much more worried that too few
+teams would be able to finish in 7 hours.</p>
+
+<p>As it turned out, the normal version was the level of difficulty we should have
+been aiming for in Hard Mode all along. But there wasn&rsquo;t time to write an
+easier Normal Mode version. So the end result was that both normal and hard
+solvers got a hard puzzle, instead of normal solvers getting a hard puzzle and
+hard solvers getting a broken puzzle. At least the disaster was averted.</p>
+
+<h2>Running BAPHL</h2>
+
+<p>There were only about 7 of us running BAPHL on site, and I&rsquo;m extremely glad
+each person was there, because I think something would have broken if we had
+even one fewer.</p>
+
+<p>30-ish teams is really an incredible turnout, and I hope BAPHL can get as many
+people involved when it happens again in the spring. Our biggest advice to Team
+Plugh, then, is to make sure they gather enough people who will be able to run
+the hunt.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[The Speln Ncorrector]]></title>
+    <link href="http://rspeer.github.io/blog/2011/03/01/speln-ncorrector/"/>
+    <updated>2011-03-01T18:18:00-05:00</updated>
+    <id>http://rspeer.github.io/blog/2011/03/01/speln-ncorrector</id>
+    <content type="html"><![CDATA[<p>Today I was experimenting with using a machine translation toolkit on problems
+besides translation. My first experiment was to try to make a system that would
+take in a word it hasn&rsquo;t seen before and guess how it was pronounced.</p>
+
+<p>I think I accidentally ran something backwards, because what I got was a system
+that takes in the legitimate pronunciation of a word, and usually outputs a
+creative new spelling that it hasn&rsquo;t seen before.</p>
+
+<p><em>I have created a spelling incorrector.</em></p>
+
+<p>Or, as it would say when I put the CMUDICT pronunciations of these words in:</p>
+
+<blockquote><p>Tude I wuz expermentn wth usin a mhin translaun tulkt on problems besids
+translaun.  M furst experment wuz 2 tri 2 mak a sstm thet wood tak in a
+word t haznt syn byfor and gs hu t wuz pranonst.</p>
+
+<p>I think I axedently ran sumthn bakwards, bkuz wut I gt wuz a sstm thet takz
+in the logitamt prenanseaun v a word, and ugly otputs a creatv nu speln
+thet t haznt syn byfor.</p>
+
+<p>I hav creatd a speln ncerector.</p></blockquote>
+
+<p>I am not kidding. Those are the actual spellings my backwards-wired system
+gives for dictionary pronunciations of those words, including spelling
+&ldquo;usually&rdquo; as &ldquo;ugly&rdquo;, &ldquo;accidentally&rdquo; as &ldquo;axedently&rdquo;, and &ldquo;to&rdquo; as &ldquo;2&rdquo;.</p>
+]]></content>
+  </entry>
+  
+  <entry>
+    <title type="html"><![CDATA[The CONFUZZLE wordlist]]></title>
+    <link href="http://rspeer.github.io/blog/2011/02/21/confuzzle/"/>
+    <updated>2011-02-21T23:00:00-05:00</updated>
+    <id>http://rspeer.github.io/blog/2011/02/21/confuzzle</id>
+    <content type="html"><![CDATA[<p><img src="http://rspeer.github.io/images/confuzzle-sample.png" /></p>
+
+<p>There are lots of text files that list the words you can use in word games like
+Scrabble. (Some of them are more accurate than others.) But as far as I know,
+this is the only one that you can print on 17 double-sided sheets of
+letter-size paper.</p>
+
+<p>The words in the list come from the excellent, public-domain ENABLE2K word
+list, compiled by Mendel Cooper. His website is sadly defunct, but the wordlist
+has become a standard for word games and puzzles.</p>
+
+<ul>
+<li>The file: <a href="http://rspeer.github.io/downloads/confuzzle.pdf">confuzzle.pdf</a></li>
+<li>LaTeX source: <a href="http://rspeer.github.io/downloads/confuzzle.tex">confuzzle.tex</a></li>
+<li>The source wordlist: <a href="http://rspeer.github.io/downloads/enable.txt">enable.txt</a></li>
+</ul>
+
+
+<p>Why would you want a wordlist on paper instead of a computer file? The same
+reason you&rsquo;d want to play word games on a board instead of on a computer.
+Sometimes, you&rsquo;d rather face the person you&rsquo;re playing against than have your
+face in a laptop.</p>
+
+<h2>How the list works</h2>
+
+<p>The list only contains words, not their definitions. Still, given that there
+are over 170,000 words in the list, it takes some effort &mdash; beyond just using a
+6-point font &mdash; to fit them on 34 pages.</p>
+
+<p>This economy of printed space is accomplished through a form of human-readable
+compression. When many consecutive words in alphabetical order start with the
+same letters, as they tend to do, they are grouped together like this:</p>
+
+<pre><code>ALLOTYP- e es ic ically ies y
+</code></pre>
+
+<p>The grouping was chosen by an algorithm, not by a lexicographer, so sometimes
+words are grouped in odd ways:</p>
+
+<pre><code>NONSOL- ar id ids ution utions
+</code></pre>
+
+<p>I&rsquo;ve also marked the differences between ENABLE and the more well-known
+standard, the Official Tournament and Club Word List 2 (OWL2). These markings
+are not authoritative, because I don&rsquo;t have an electronic file of OWL2. I
+compiled the differences mainly from <a href="http://www.scrabbleassociation.com/boards/dictionary/octwl2.html">this National Scrabble Association
+page</a>.</p>
+
+<p>Locating the code that chose the groupings will, unfortunately, take a bit of
+hard-drive archaeology. I made the list in 2003, updated it for OWL2 in 2006,
+and updated it manually in 2011 to incorporate the National Scrabble
+Association&rsquo;s errata to OWL2.</p>
+]]></content>
+  </entry>
+  
+</feed>
