@@ -4,7 +4,7 @@
   <title><![CDATA[Category: glitches | rspeer]]></title>
   <link href="http://rspeer.github.io/blog/categories/glitches/atom.xml" rel="self"/>
   <link href="http://rspeer.github.io/"/>
-  <updated>2014-03-30T19:46:39-04:00</updated>
+  <updated>2014-03-30T19:51:36-04:00</updated>
   <id>http://rspeer.github.io/</id>
   <author>
     <name><![CDATA[Rob Speer]]></name>
@@ -22,7 +22,7 @@
 
 <p>You might not have heard much about UTF-7. It doesn&rsquo;t have very much at all to do with <a href="http://en.wikipedia.org/wiki/UTF-8">UTF-8</a>, the well-designed (by Ken Thompson) representation of Unicode that&rsquo;s taking over the world. <a href="http://en.wikipedia.org/wiki/UTF-7">UTF-7</a> is a poorly-designed, obsolete proposal for encapsulating Unicode inside ASCII itself.</p>
 
-<p>The Python bug (which is fixed now) is that the encoder doesn&rsquo;t reset its state correctly when it encounters an erroneous UTF-7 sequence. You can make these errors pile up, until they add up to an impossible character, at codepoint U+DEADBEEF.</p>
+<p>The Python bug, which is fixed now, is that the encoder doesn&rsquo;t reset its state correctly when it encounters an erroneous UTF-7 sequence. You can make these errors pile up until they add up to an impossible character, at codepoint U+DEADBEEF.</p>
 
 <p>(While Unicode codepoints are often represented as 32-bit integers, not all 32-bit integers are Unicode codepoints. The highest possible Unicode codepoint is U+10FFFF.)</p>
 
