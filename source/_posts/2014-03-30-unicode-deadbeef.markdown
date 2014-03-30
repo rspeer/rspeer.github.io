@@ -9,7 +9,7 @@ A few months ago I posted a [Gist about ways to totally break Python's Unicode r
 
 You might not have heard much about UTF-7. It doesn't have very much at all to do with [UTF-8](http://en.wikipedia.org/wiki/UTF-8), the well-designed (by Ken Thompson) representation of Unicode that's taking over the world. [UTF-7](http://en.wikipedia.org/wiki/UTF-7) is a poorly-designed, obsolete proposal for encapsulating Unicode inside ASCII itself.
 
-The Python bug (which is fixed now) is that the encoder doesn't reset its state correctly when it encounters an erroneous UTF-7 sequence. You can make these errors pile up, until they add up to an impossible character, at codepoint U+DEADBEEF.
+The Python bug, which is fixed now, is that the encoder doesn't reset its state correctly when it encounters an erroneous UTF-7 sequence. You can make these errors pile up until they add up to an impossible character, at codepoint U+DEADBEEF.
 
 (While Unicode codepoints are often represented as 32-bit integers, not all 32-bit integers are Unicode codepoints. The highest possible Unicode codepoint is U+10FFFF.)
 
