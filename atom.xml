@@ -4,7 +4,7 @@
   <title><![CDATA[rspeer]]></title>
   <link href="http://rspeer.github.io/atom.xml" rel="self"/>
   <link href="http://rspeer.github.io/"/>
-  <updated>2014-03-30T19:27:53-04:00</updated>
+  <updated>2014-03-30T19:29:47-04:00</updated>
   <id>http://rspeer.github.io/</id>
   <author>
     <name><![CDATA[Rob Speer]]></name>
@@ -42,6 +42,9 @@
 
 <h2>UTF-7 is a vulnerability</h2>
 
+<!-- more -->
+
+
 <p>Even if the decoder were bug-free, UTF-7 would be a totally unsuitable encoding for exchanging data. The fact that you can hide ASCII characters as other strings in UTF-7 has been used in <a href="http://nedbatchelder.com/blog/200704/xss_with_utf7.html">a real XSS vulnerability</a> that was only fixed by major Web browsers disabling automatic UTF-7 decoding.</p>
 
 <figure class='code'><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
@@ -65,11 +68,6 @@
 </span><span class='line'><span class="o">&gt;&gt;&gt;</span> <span class="k">print</span><span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">string</span><span class="p">))</span>
 </span><span class='line'><span class="s">&quot;Here&#39;s a snowman: </span><span class="se">\u2603</span><span class="s">&quot;</span>
 </span></code></pre></td></tr></table></div></figure>
-
-
-<p>Read on for the code, and my recommended approach to decoding unfamiliar text.</p>
-
-<!-- more -->
 
 
 <h2>Make a whitelist of encodings</h2>

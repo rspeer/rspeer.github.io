@@ -4,7 +4,7 @@
   <title><![CDATA[Category: glitches | rspeer]]></title>
   <link href="http://rspeer.github.io/blog/categories/glitches/atom.xml" rel="self"/>
   <link href="http://rspeer.github.io/"/>
-  <updated>2014-03-30T19:27:53-04:00</updated>
+  <updated>2014-03-30T19:29:47-04:00</updated>
   <id>http://rspeer.github.io/</id>
   <author>
     <name><![CDATA[Rob Speer]]></name>
@@ -42,6 +42,9 @@
 
 <h2>UTF-7 is a vulnerability</h2>
 
+<!-- more -->
+
+
 <p>Even if the decoder were bug-free, UTF-7 would be a totally unsuitable encoding for exchanging data. The fact that you can hide ASCII characters as other strings in UTF-7 has been used in <a href="http://nedbatchelder.com/blog/200704/xss_with_utf7.html">a real XSS vulnerability</a> that was only fixed by major Web browsers disabling automatic UTF-7 decoding.</p>
 
 <p><code>
@@ -60,11 +63,6 @@ Here&rsquo;s a snowman: ☃</p>
 print(json.dumps(string))
 &ldquo;Here&rsquo;s a snowman: \u2603&rdquo;
 ```</p></blockquote></blockquote></blockquote>
-
-<p>Read on for the code, and my recommended approach to decoding unfamiliar text.</p>
-
-<!-- more -->
-
 
 <h2>Make a whitelist of encodings</h2>
 
