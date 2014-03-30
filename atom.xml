@@ -4,7 +4,7 @@
   <title><![CDATA[rspeer]]></title>
   <link href="http://rspeer.github.io/atom.xml" rel="self"/>
   <link href="http://rspeer.github.io/"/>
-  <updated>2014-03-30T19:12:27-04:00</updated>
+  <updated>2014-03-30T19:27:53-04:00</updated>
   <id>http://rspeer.github.io/</id>
   <author>
     <name><![CDATA[Rob Speer]]></name>
@@ -20,13 +20,15 @@
     <id>http://rspeer.github.io/blog/2014/03/30/unicode-deadbeef</id>
     <content type="html"><![CDATA[<p>A few months ago I posted a <a href="https://gist.github.com/rspeer/7559750">Gist about ways to totally break Python&rsquo;s Unicode representation</a>, by exploiting <a href="http://bugs.python.org/issue19279">bug #19279</a> in its UTF-7 decoder.</p>
 
-<p>The bug (which is fixed now) is that the encoder doesn&rsquo;t reset its state correctly when it encounters an erroneous UTF-7 sequence. You can make these errors pile up, until they add up to an impossible character, at codepoint U+DEADBEEF.</p>
+<p>You might not have heard much about UTF-7. It doesn&rsquo;t have very much at all to do with <a href="http://en.wikipedia.org/wiki/UTF-8">UTF-8</a>, the well-designed (by Ken Thompson) representation of Unicode that&rsquo;s taking over the world. <a href="http://en.wikipedia.org/wiki/UTF-7">UTF-7</a> is a poorly-designed, obsolete proposal for hiding Unicode inside ASCII.</p>
+
+<p>The Python bug (which is fixed now) is that the encoder doesn&rsquo;t reset its state correctly when it encounters an erroneous UTF-7 sequence. You can make these errors pile up, until they add up to an impossible character, at codepoint U+DEADBEEF.</p>
 
 <p>(While Unicode codepoints are often represented as 32-bit integers, not all 32-bit integers are Unicode codepoints. The highest possible Unicode codepoint is U+10FFFF.)</p>
 
 <p>Once you have this impossible character in a string, you can pass it to standard library functions to cause all sorts of data corruption, including making a SQLite database unreadable.</p>
 
-<p>There&rsquo;s one easy lesson to take from this: keep Python up to date. If you&rsquo;re on Python 2.7.6 or later, you won&rsquo;t encounter this particular bug. But then, this isn&rsquo;t <a href="http://bugs.python.org/issue20538">the last UTF-7 bug</a> in Python.</p>
+<p>There&rsquo;s one easy lesson to take from this: keep Python up to date. If you&rsquo;re on Python 2.7.6 or 3.3 or later, you won&rsquo;t encounter this particular bug. But then, this isn&rsquo;t <a href="http://bugs.python.org/issue20538">the last UTF-7 bug</a> in Python.</p>
 
 <p>Here&rsquo;s the more important lesson, though, which applies in any programming language:</p>
 
