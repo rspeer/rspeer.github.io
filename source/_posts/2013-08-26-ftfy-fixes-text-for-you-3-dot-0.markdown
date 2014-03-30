@@ -3,7 +3,7 @@ layout: post
 title: "ftfy (fixes text for you) version 3.0"
 date: 2013-08-26 18:27:44 -0400
 comments: true
-categories: python, unicode, software
+categories: [python, unicode, software, luminoso]
 ---
 About a year ago, Luminoso blogged about how to ungarble garbled Unicode in a post called [Fixing common Unicode mistakes with Python â€” after they’ve been made](http://blog.luminoso.com/2012/08/20/fix-unicode-mistakes-with-python/). Shortly after that, we released the code in a Python package called [ftfy](https://github.com/LuminosoInsight/python-ftfy).
 
