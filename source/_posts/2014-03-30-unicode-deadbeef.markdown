@@ -29,6 +29,8 @@ Some of these attacks are theoretical, but there are a few real web pages out th
 
 ## UTF-7 is a vulnerability
 
+<!-- more -->
+
 Even if the decoder were bug-free, UTF-7 would be a totally unsuitable encoding for exchanging data. The fact that you can hide ASCII characters as other strings in UTF-7 has been used in [a real XSS vulnerability](http://nedbatchelder.com/blog/200704/xss_with_utf7.html) that was only fixed by major Web browsers disabling automatic UTF-7 decoding.
 
 ```
@@ -46,10 +48,6 @@ Here's a snowman: ☃
 >>> print(json.dumps(string))
 "Here's a snowman: \u2603"
 ```
-
-Read on for the code, and my recommended approach to decoding unfamiliar text.
-
-<!-- more -->
 
 ## Make a whitelist of encodings
 
