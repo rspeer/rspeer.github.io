@@ -4,7 +4,7 @@
   <title><![CDATA[Category: python | rspeer]]></title>
   <link href="http://rspeer.github.io/blog/categories/python/atom.xml" rel="self"/>
   <link href="http://rspeer.github.io/"/>
-  <updated>2014-03-30T19:43:10-04:00</updated>
+  <updated>2014-03-30T19:46:39-04:00</updated>
   <id>http://rspeer.github.io/</id>
   <author>
     <name><![CDATA[Rob Speer]]></name>
@@ -20,7 +20,7 @@
     <id>http://rspeer.github.io/blog/2014/03/30/unicode-deadbeef</id>
     <content type="html"><![CDATA[<p>A few months ago I posted a <a href="https://gist.github.com/rspeer/7559750">Gist about ways to totally break Python&rsquo;s Unicode representation</a>, by exploiting <a href="http://bugs.python.org/issue19279">bug #19279</a> in its UTF-7 decoder.</p>
 
-<p>You might not have heard much about UTF-7. It doesn&rsquo;t have very much at all to do with <a href="http://en.wikipedia.org/wiki/UTF-8">UTF-8</a>, the well-designed (by Ken Thompson) representation of Unicode that&rsquo;s taking over the world. <a href="http://en.wikipedia.org/wiki/UTF-7">UTF-7</a> is a poorly-designed, obsolete proposal for hiding Unicode inside ASCII.</p>
+<p>You might not have heard much about UTF-7. It doesn&rsquo;t have very much at all to do with <a href="http://en.wikipedia.org/wiki/UTF-8">UTF-8</a>, the well-designed (by Ken Thompson) representation of Unicode that&rsquo;s taking over the world. <a href="http://en.wikipedia.org/wiki/UTF-7">UTF-7</a> is a poorly-designed, obsolete proposal for encapsulating Unicode inside ASCII itself.</p>
 
 <p>The Python bug (which is fixed now) is that the encoder doesn&rsquo;t reset its state correctly when it encounters an erroneous UTF-7 sequence. You can make these errors pile up, until they add up to an impossible character, at codepoint U+DEADBEEF.</p>
 

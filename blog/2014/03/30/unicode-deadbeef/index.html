@@ -37,19 +37,6 @@
 
 
   
-  <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-25625183-3']);
-    _gaq.push(['_setDomainName','github.io']);
-    _gaq.push(['_trackPageview']);
-
-    (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-    })();
-  </script>
-
 
 </head>
 
@@ -108,7 +95,7 @@
 
 <div class="entry-content"><p>A few months ago I posted a <a href="https://gist.github.com/rspeer/7559750">Gist about ways to totally break Python&rsquo;s Unicode representation</a>, by exploiting <a href="http://bugs.python.org/issue19279">bug #19279</a> in its UTF-7 decoder.</p>
 
-<p>You might not have heard much about UTF-7. It doesn&rsquo;t have very much at all to do with <a href="http://en.wikipedia.org/wiki/UTF-8">UTF-8</a>, the well-designed (by Ken Thompson) representation of Unicode that&rsquo;s taking over the world. <a href="http://en.wikipedia.org/wiki/UTF-7">UTF-7</a> is a poorly-designed, obsolete proposal for hiding Unicode inside ASCII.</p>
+<p>You might not have heard much about UTF-7. It doesn&rsquo;t have very much at all to do with <a href="http://en.wikipedia.org/wiki/UTF-8">UTF-8</a>, the well-designed (by Ken Thompson) representation of Unicode that&rsquo;s taking over the world. <a href="http://en.wikipedia.org/wiki/UTF-7">UTF-7</a> is a poorly-designed, obsolete proposal for encapsulating Unicode inside ASCII itself.</p>
 
 <p>The Python bug (which is fixed now) is that the encoder doesn&rsquo;t reset its state correctly when it encounters an erroneous UTF-7 sequence. You can make these errors pile up, until they add up to an impossible character, at codepoint U+DEADBEEF.</p>
 
@@ -392,8 +379,6 @@
   
 
   
-    <a href="" title="g+#105052841606328779528"><i class="fa fa-google-plus fa-2x"></i></a>
-  
 
   
     <a href="https://github.com/rspeer" title="rspeer"><i class="fa fa-github fa-2x"></i></a>
@@ -448,15 +433,6 @@
 <section>
   <h1>Categories</h1>
     <ul id="category-list"><li><a href='/blog/categories/games'>games (1)</a></li><li><a href='/blog/categories/glitches'>glitches (2)</a></li><li><a href='/blog/categories/luminoso'>luminoso (2)</a></li><li><a href='/blog/categories/meta'>meta (1)</a></li><li><a href='/blog/categories/projects'>projects (1)</a></li><li><a href='/blog/categories/puzzles'>puzzles (1)</a></li><li><a href='/blog/categories/python'>python (2)</a></li><li><a href='/blog/categories/retro-games'>retro games (1)</a></li><li><a href='/blog/categories/software'>software (2)</a></li><li><a href='/blog/categories/unicode'>unicode (3)</a></li><li><a href='/blog/categories/wordplay'>wordplay (2)</a></li></ul>
-</section>
-
-<section class="googleplus">
-  <h1>
-    <a href="https://plus.google.com/105052841606328779528?rel=author">
-      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
-      Google+
-    </a>
-  </h1>
 </section>
 
 
