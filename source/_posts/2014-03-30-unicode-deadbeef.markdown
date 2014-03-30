@@ -7,13 +7,15 @@ categories: [unicode, python, glitches]
 ---
 A few months ago I posted a [Gist about ways to totally break Python's Unicode representation](https://gist.github.com/rspeer/7559750), by exploiting [bug #19279](http://bugs.python.org/issue19279) in its UTF-7 decoder.
 
-The bug (which is fixed now) is that the encoder doesn't reset its state correctly when it encounters an erroneous UTF-7 sequence. You can make these errors pile up, until they add up to an impossible character, at codepoint U+DEADBEEF.
+You might not have heard much about UTF-7. It doesn't have very much at all to do with [UTF-8](http://en.wikipedia.org/wiki/UTF-8), the well-designed (by Ken Thompson) representation of Unicode that's taking over the world. [UTF-7](http://en.wikipedia.org/wiki/UTF-7) is a poorly-designed, obsolete proposal for hiding Unicode inside ASCII.
+
+The Python bug (which is fixed now) is that the encoder doesn't reset its state correctly when it encounters an erroneous UTF-7 sequence. You can make these errors pile up, until they add up to an impossible character, at codepoint U+DEADBEEF.
 
 (While Unicode codepoints are often represented as 32-bit integers, not all 32-bit integers are Unicode codepoints. The highest possible Unicode codepoint is U+10FFFF.)
 
 Once you have this impossible character in a string, you can pass it to standard library functions to cause all sorts of data corruption, including making a SQLite database unreadable.
 
-There's one easy lesson to take from this: keep Python up to date. If you're on Python 2.7.6 or later, you won't encounter this particular bug. But then, this isn't [the last UTF-7 bug](http://bugs.python.org/issue20538) in Python.
+There's one easy lesson to take from this: keep Python up to date. If you're on Python 2.7.6 or 3.3 or later, you won't encounter this particular bug. But then, this isn't [the last UTF-7 bug](http://bugs.python.org/issue20538) in Python.
 
 Here's the more important lesson, though, which applies in any programming language:
 
