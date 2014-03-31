@@ -4,7 +4,7 @@
   <title><![CDATA[Category: glitches | rspeer]]></title>
   <link href="http://rspeer.github.io/blog/categories/glitches/atom.xml" rel="self"/>
   <link href="http://rspeer.github.io/"/>
-  <updated>2014-03-30T19:51:36-04:00</updated>
+  <updated>2014-03-31T00:01:54-04:00</updated>
   <id>http://rspeer.github.io/</id>
   <author>
     <name><![CDATA[Rob Speer]]></name>
@@ -82,17 +82,17 @@ print(json.dumps(string))
 </ul>
 
 
-<p>This covers all the easy cases, leaving us with the mess of encodings that China, Japan, and Korea have created and continue to use because they&rsquo;re too proud to adopt UTF-8. If you intend to have solid support for a CJK language, where you&rsquo;ll probably encounter other problems besides just decoding the text, add some more encodings to your whitelist:</p>
+<p>This covers all the easy cases, leaving us with the mess of encodings that China, Japan, and Korea have created and continue to use instead of UTF-8. If you intend to have solid support for a CJK language, where you&rsquo;ll probably encounter other problems besides just decoding the text, add some more encodings to your whitelist:</p>
 
 <ul>
 <li>If you support Japanese text, you should support <code>Shift-JIS</code> and <code>EUC-JP</code>.</li>
 <li>If you support Korean text, you should support <code>EUC-KR</code>.</li>
 <li>If you support Traditional Chinese text, you should support <code>Big5</code>.</li>
-<li>If you support Simplified Chinese text, you should support <code>GBK</code>.</li>
+<li>If you support Simplified Chinese text, you should support <code>GBK</code> and probably its extension <code>GB18030</code>.</li>
 </ul>
 
 
-<p>I don&rsquo;t know enough about <code>GB18030</code>, the Chinese-centric alternative to UTF-8. It seems incredibly complex, and although it&rsquo;s the official standard of the People&rsquo;s Republic of China, I get the idea that it&rsquo;s not used in practice that much.</p>
+<p>I don&rsquo;t know enough about <code>GB18030</code>, the Chinese-centric alternative to UTF-8. It&rsquo;s the official standard of the People&rsquo;s Republic of China, but it seems remarkably complex. I wouldn&rsquo;t whitelist it in a system that isn&rsquo;t expecting Chinese text, but on the other hand, GB18030 is preferable to GBK because it supports all of Unicode. So if you&rsquo;re going to support GBK, you should probably support GB18030.</p>
 
 <h2>The U+DEADBEEF code</h2>
 

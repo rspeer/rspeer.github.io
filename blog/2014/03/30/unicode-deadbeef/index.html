@@ -176,17 +176,17 @@
 </ul>
 
 
-<p>This covers all the easy cases, leaving us with the mess of encodings that China, Japan, and Korea have created and continue to use because they&rsquo;re too proud to adopt UTF-8. If you intend to have solid support for a CJK language, where you&rsquo;ll probably encounter other problems besides just decoding the text, add some more encodings to your whitelist:</p>
+<p>This covers all the easy cases, leaving us with the mess of encodings that China, Japan, and Korea have created and continue to use instead of UTF-8. If you intend to have solid support for a CJK language, where you&rsquo;ll probably encounter other problems besides just decoding the text, add some more encodings to your whitelist:</p>
 
 <ul>
 <li>If you support Japanese text, you should support <code>Shift-JIS</code> and <code>EUC-JP</code>.</li>
 <li>If you support Korean text, you should support <code>EUC-KR</code>.</li>
 <li>If you support Traditional Chinese text, you should support <code>Big5</code>.</li>
-<li>If you support Simplified Chinese text, you should support <code>GBK</code>.</li>
+<li>If you support Simplified Chinese text, you should support <code>GBK</code> and probably its extension <code>GB18030</code>.</li>
 </ul>
 
 
-<p>I don&rsquo;t know enough about <code>GB18030</code>, the Chinese-centric alternative to UTF-8. It seems incredibly complex, and although it&rsquo;s the official standard of the People&rsquo;s Republic of China, I get the idea that it&rsquo;s not used in practice that much.</p>
+<p>I don&rsquo;t know enough about <code>GB18030</code>, the Chinese-centric alternative to UTF-8. It&rsquo;s the official standard of the People&rsquo;s Republic of China, but it seems remarkably complex. I wouldn&rsquo;t whitelist it in a system that isn&rsquo;t expecting Chinese text, but on the other hand, GB18030 is preferable to GBK because it supports all of Unicode. So if you&rsquo;re going to support GBK, you should probably support GB18030.</p>
 
 <h2>The U+DEADBEEF code</h2>
 
@@ -363,6 +363,8 @@
         <a class="basic-alignment left" href="/blog/2014/03/30/old-posts-and-a-new-blog/" title="Previous Post: Old posts and a new blog">&laquo; Old posts and a new blog</a>
       
       
+        <a class="basic-alignment right" href="/blog/2014/03/31/python-3-4-from-scratch/" title="Next Post: Python 3.4 from scratch, in an isolated environment">Python 3.4 from scratch, in an isolated environment &raquo;</a>
+      
     </p>
   </footer>
 </article>
@@ -412,6 +414,10 @@
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2014/03/31/python-3-4-from-scratch/">Python 3.4 from scratch, in an isolated environment</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2014/03/30/unicode-deadbeef/">U+DEADBEEF: Why you shouldn't trust arbitrary text encodings</a>
       </li>
     
@@ -447,7 +453,7 @@
 </section>
 <section>
   <h1>Categories</h1>
-    <ul id="category-list"><li><a href='/blog/categories/games'>games (1)</a></li><li><a href='/blog/categories/glitches'>glitches (2)</a></li><li><a href='/blog/categories/luminoso'>luminoso (2)</a></li><li><a href='/blog/categories/meta'>meta (1)</a></li><li><a href='/blog/categories/projects'>projects (1)</a></li><li><a href='/blog/categories/puzzles'>puzzles (1)</a></li><li><a href='/blog/categories/python'>python (2)</a></li><li><a href='/blog/categories/retro-games'>retro games (1)</a></li><li><a href='/blog/categories/software'>software (2)</a></li><li><a href='/blog/categories/unicode'>unicode (3)</a></li><li><a href='/blog/categories/wordplay'>wordplay (2)</a></li></ul>
+    <ul id="category-list"><li><a href='/blog/categories/games'>games (1)</a></li><li><a href='/blog/categories/glitches'>glitches (2)</a></li><li><a href='/blog/categories/luminoso'>luminoso (2)</a></li><li><a href='/blog/categories/meta'>meta (1)</a></li><li><a href='/blog/categories/projects'>projects (1)</a></li><li><a href='/blog/categories/puzzles'>puzzles (1)</a></li><li><a href='/blog/categories/python'>python (3)</a></li><li><a href='/blog/categories/retro-games'>retro games (1)</a></li><li><a href='/blog/categories/software'>software (2)</a></li><li><a href='/blog/categories/unicode'>unicode (3)</a></li><li><a href='/blog/categories/wordplay'>wordplay (2)</a></li></ul>
 </section>
 
 <section class="googleplus">

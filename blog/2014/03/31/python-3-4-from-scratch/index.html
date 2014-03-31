@@ -1,0 +1,428 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Python 3.4 from scratch, in an isolated environment - rspeer</title>
+  <meta name="author" content="Rob Speer">
+
+  
+  <meta name="description" content="Do you want to experiment with the new features of Python 3.4 without installing it system-wide? There are multiple reasons you might want to do this &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://rspeer.github.io/blog/2014/03/31/python-3-4-from-scratch/">
+  <link href="/favicon.png" rel="icon">
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+   <link href="/stylesheets/data-table.css" media="screen, projection" rel="stylesheet" type="text/css" />
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="rspeer" type="application/atom+xml">
+  <link href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" rel="stylesheet">
+
+<!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href='http://fonts.googleapis.com/css?family=Lato:400,100,100italic,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Lora:400,400italic,700,700italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Source+Code+Pro:200,300,400,500,600,700,900' rel='stylesheet' type='text/css'>
+
+
+
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-25625183-3']);
+    _gaq.push(['_setDomainName','github.io']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   >
+  <header role="banner"><hgroup>
+</hgroup>
+
+</header>
+  <!-- <nav role="navigation"><ul class="subscription" data-subscription="rss">
+  <li><a href="/atom.xml" rel="subscribe-rss" title="subscribe via RSS">RSS</a></li>
+  
+</ul>
+  
+<form action="https://www.google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:rspeer.github.io" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="/">Blog</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav> -->
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Python 3.4 from scratch, in an isolated environment</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-31T04:48:35-04:00" pubdate data-updated="true">Mar 31<span>st</span>, 2014</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>Do you want to experiment with the new features of <a href="http://docs.python.org/dev/whatsnew/3.4.html">Python 3.4</a> without installing it system-wide? There are multiple reasons you might want to do this:</p>
+
+<ul>
+<li>Your operating system doesn&rsquo;t have a supported package for it yet, and installing an experimental one might cause problems later</li>
+<li>You&rsquo;re concerned about accidentally running into Python version conflicts when you have multiple installed versions of Python</li>
+<li>You don&rsquo;t have root access, or you&rsquo;d prefer not to use it</li>
+<li>You do everything in a virtualenv anyway, so what&rsquo;s the point of having another wrong place for packages to go?</li>
+</ul>
+
+
+<p>Assuming you&rsquo;re on a reasonable Unix system (particularly Linux or Mac OS), you can accomplish this by building Python from the source code.</p>
+
+<p>The new features of Python 3.4 make it very easy to install and start using it in an isolated way that never touches your <code>/usr</code> directory. Unlike Python 3.3 and earlier, you&rsquo;ll be able to quickly get started using <code>venv</code> and <code>pip</code>, and you won&rsquo;t be stuck in the purgatory of missing packages that <code>venv</code> would leave you in on 3.3.</p>
+
+<p>I&rsquo;ve tested these steps on Mac OS 10.9 and Ubuntu 13.10 Saucy Salamander.</p>
+
+<h2>Step 1: C dependencies</h2>
+
+<p>This is a step where it is helpful to be root, if there are dependencies that you need but don&rsquo;t have yet. However, it&rsquo;s not strictly essential; you could install these dependencies under a custom prefix. To keep it simple, though, I&rsquo;m going to assume you can install the dependencies system-wide.</p>
+
+<p>Given that this is the CPython interpreter, you&rsquo;re going to need a C compiler (particularly <code>gcc</code>) to build it. On Mac OS, installing Xcode from the App Store gives everything that you need. On Ubuntu, you can get it with</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo apt-get install build-essential
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Python links to many external libraries to implement parts of its standard library, such as <code>sqlite3</code> and <code>readline</code>. I&rsquo;ve found that if you&rsquo;re missing these libraries, it <em>will</em> compile, but of course you won&rsquo;t be able to use those libraries. The <code>ipython</code> experience in particular will be terrible without those libraries.</p>
+
+<p>On my Mac, I found I had nearly everything that I needed already installed. This might be because I&rsquo;ve already installed Python with Homebrew before, though. I do highly recommend Homebrew as a way of setting up development on a Mac. I was missing <code>ossaudiodev</code> support, which I don&rsquo;t plan to use anyway.</p>
+
+<p>On Ubuntu, this command will install all of the library dependencies:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo apt-get install libc6-dev libreadline-dev libz-dev libncursesw5-dev <span class="se">\</span>
+</span><span class='line'>     libssl-dev libgdbm-dev libsqlite3-dev libbz2-dev liblzma-dev tk-dev
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Step 2: Extract and compile Python</h2>
+
+<p>You&rsquo;re done with the hard part. The rest of the steps are things that should be as smooth as butter in Python 3.4.</p>
+
+<p>Get the current source download from <a href="https://www.python.org/downloads/">https://www.python.org/downloads/</a> . Right now, that&rsquo;ll give you a file called <code>Python-3.4.0.tar.xz</code>. Save it into a directory that you&rsquo;d be happy running Python from, and change to that directory at the command line.</p>
+
+<p>Then run:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>tar xvf Python-3.4.0.tar.gz
+</span><span class='line'><span class="nb">cd </span>Python-3.4.0
+</span><span class='line'>./configure <span class="o">&amp;&amp;</span> make
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Sit back and relax for a few minutes.</p>
+
+<p>At the end, if you were missing any optional libraries, Python will warn you about them. If anything shows up that you would sorely miss, go install the appropriate library, and <code>make</code> again.</p>
+
+<h2>Step 3: Make your Python environment</h2>
+
+<p>We didn&rsquo;t run the traditional last step, <code>sudo make install</code>, because we don&rsquo;t need to! You&rsquo;ve got everything you need to build a local Python environment right here, using Python 3&rsquo;s new <code>venv</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mkdir -p ~/.virtualenvs
+</span><span class='line'>./python -m venv ~/.virtualenvs/py34
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To activate this environment, now or in the future, run:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">source</span> ~/.virtualenvs/py34/bin/activate
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You could put it in a different directory. I chose this location because it&rsquo;s compatible with Doug Hellmann&rsquo;s <a href="http://virtualenvwrapper.readthedocs.org/en/latest/">virtualenvwrapper</a>. If you have virtualenvwrapper installed, even from a previous version of Python, you can just run <code>workon py34</code> instead. It&rsquo;s totally fine with the fact that this environment was built with <code>venv</code>, not <code>virtualenv</code>.</p>
+
+<p><strong>You are now using Python 3.4</strong>. Type <code>python</code> and play around a bit.</p>
+
+<p>But, of course, it&rsquo;s not really your Python environment until you&rsquo;ve got packages installed. Fortunately, <code>pip</code> is already set up for this new environment!</p>
+
+<p>Just to be sure, type <code>which pip</code>. It should show you a path in your <code>py34/bin</code> directory. If it says something like <code>/usr/bin/pip</code>, either you&rsquo;ve forgotten to activate your environment or something has gone terribly wrong.</p>
+
+<p>Now you can use this copy of <code>pip</code> to install your favorite packages:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pip install requests
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&rsquo;s install IPython while we&rsquo;re at it:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pip install ipython
+</span><span class='line'>ipython3
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>IPython will install itself as <code>ipython3</code>, a compromise for the benefit of less-fortunate users who don&rsquo;t have virtualenvs set up. You could symlink <code>py34/bin/ipython</code> to <code>py34/bin/ipython3</code>, because you won&rsquo;t be needing ipython2 in this environment.</p>
+
+<h2>Deactivating Python 3.4</h2>
+
+<p>When the time comes that you need to work on old code instead of living gloriously in the future, all you need to do is:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>deactivate
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The rest of your system is exactly as you left it until you activate the environment again.</p>
+
+<h2>The not-so-isolated, really easy, bonus version</h2>
+
+<p>If you <em>do</em> have Python 3.4 installed system-wide &mdash; maybe you&rsquo;re on Ubuntu 14.04 already &mdash; then you can skip most of these steps and go straight to making the venv:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mkdir -p ~/.virtualenvs
+</span><span class='line'>python3.4 -m venv ~/.virtualenvs/py34
+</span><span class='line'><span class="nb">source</span> ~/.virtualenvs/py34/bin/activate
+</span><span class='line'>pip install ipython
+</span><span class='line'>ipython3
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn">Rob Speer</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2014-03-31T04:48:35-04:00" pubdate data-updated="true">Mar 31<span>st</span>, 2014</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/python/'>python</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://rspeer.github.io/blog/2014/03/31/python-3-4-from-scratch/" data-via="r_speer" data-counturl="http://rspeer.github.io/blog/2014/03/31/python-3-4-from-scratch/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2014/03/30/unicode-deadbeef/" title="Previous Post: U+DEADBEEF: Why you shouldn't trust arbitrary text encodings">&laquo; U+DEADBEEF: Why you shouldn't trust arbitrary text encodings</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+</div>
+
+<aside class="sidebar">
+  
+    <section id="titles">
+  <a href="http://rspeer.github.io" title="rspeer"><img id="logo" src="http://rspeer.github.io/images/OMGHAX.png" /></a>
+  <h1 id="site_title"><a href="http://rspeer.github.io" title="rspeer">rspeer</a></h1>
+  <h3 id="site_subtitle"></h3>
+</section>
+
+<section id="menu">
+  <ul>
+    <li><i class="fa fa-home fa-lg"></i><a href="http://rspeer.github.io"> Home </a></li>
+    <li><i class="fa fa-calendar fa-lg"></i><a href="http://rspeer.github.io/blog/archives/"> Archives </a></li>
+    <li><i class="fa fa-user fa-lg"></i><a href="http://rspeer.github.io/about/"> About </a></li>
+    <li><i class="fa fa-rss fa-lg"></i><a href="http://rspeer.github.io/atom.xml"> Feed </a></li>
+  </ul>
+</section>
+
+<section id="social">
+  
+
+  
+
+  
+    <a href="" title="g+#105052841606328779528"><i class="fa fa-google-plus fa-2x"></i></a>
+  
+
+  
+    <a href="https://github.com/rspeer" title="rspeer"><i class="fa fa-github fa-2x"></i></a>
+  
+
+  
+
+  
+    <a href="https://twitter.com/r_speer" title="r_speer"><i class="fa fa-twitter fa-2x"></i></a>
+  
+</section>
+
+
+<section>
+  <h1>Recent Posts</h1>
+  <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2014/03/31/python-3-4-from-scratch/">Python 3.4 from scratch, in an isolated environment</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/03/30/unicode-deadbeef/">U+DEADBEEF: Why you shouldn't trust arbitrary text encodings</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2014/03/30/old-posts-and-a-new-blog/">Old posts and a new blog</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/09/04/emoji-are-more-common-than-hyphens/">Emoji are more common than hyphens. Is your software ready?</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2013/08/26/ftfy-fixes-text-for-you-3-dot-0/">ftfy (fixes text for you) version 3.0</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/08/04/super-mao-bros/">Super Mao Bros.</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/30/baphl-4/">BAPHL 4 post-mortem</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/03/01/speln-ncorrector/">The Speln Ncorrector</a>
+      </li>
+    
+      <li class="post">
+        <a href="/blog/2011/02/21/confuzzle/">The CONFUZZLE wordlist</a>
+      </li>
+    
+  </ul>
+</section>
+<section>
+  <h1>Categories</h1>
+    <ul id="category-list"><li><a href='/blog/categories/games'>games (1)</a></li><li><a href='/blog/categories/glitches'>glitches (2)</a></li><li><a href='/blog/categories/luminoso'>luminoso (2)</a></li><li><a href='/blog/categories/meta'>meta (1)</a></li><li><a href='/blog/categories/projects'>projects (1)</a></li><li><a href='/blog/categories/puzzles'>puzzles (1)</a></li><li><a href='/blog/categories/python'>python (3)</a></li><li><a href='/blog/categories/retro-games'>retro games (1)</a></li><li><a href='/blog/categories/software'>software (2)</a></li><li><a href='/blog/categories/unicode'>unicode (3)</a></li><li><a href='/blog/categories/wordplay'>wordplay (2)</a></li></ul>
+</section>
+
+<section class="googleplus">
+  <h1>
+    <a href="https://plus.google.com/105052841606328779528?rel=author">
+      <img src="http://www.google.com/images/icons/ui/gprofile_button-32.png" width="32" height="32">
+      Google+
+    </a>
+  </h1>
+</section>
+
+
+
+  
+</aside>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2014 - Rob Speer -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+
+
+
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = '//platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -4,7 +4,7 @@
   <title><![CDATA[rspeer]]></title>
   <link href="http://rspeer.github.io/atom.xml" rel="self"/>
   <link href="http://rspeer.github.io/"/>
-  <updated>2014-03-30T19:51:36-04:00</updated>
+  <updated>2014-03-31T00:01:54-04:00</updated>
   <id>http://rspeer.github.io/</id>
   <author>
     <name><![CDATA[Rob Speer]]></name>
@@ -12,6 +12,148 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Python 3.4 from scratch, in an isolated environment]]></title>
+    <link href="http://rspeer.github.io/blog/2014/03/31/python-3-4-from-scratch/"/>
+    <updated>2014-03-31T04:48:35-04:00</updated>
+    <id>http://rspeer.github.io/blog/2014/03/31/python-3-4-from-scratch</id>
+    <content type="html"><![CDATA[<p>Do you want to experiment with the new features of <a href="http://docs.python.org/dev/whatsnew/3.4.html">Python 3.4</a> without installing it system-wide? There are multiple reasons you might want to do this:</p>
+
+<ul>
+<li>Your operating system doesn&rsquo;t have a supported package for it yet, and installing an experimental one might cause problems later</li>
+<li>You&rsquo;re concerned about accidentally running into Python version conflicts when you have multiple installed versions of Python</li>
+<li>You don&rsquo;t have root access, or you&rsquo;d prefer not to use it</li>
+<li>You do everything in a virtualenv anyway, so what&rsquo;s the point of having another wrong place for packages to go?</li>
+</ul>
+
+
+<p>Assuming you&rsquo;re on a reasonable Unix system (particularly Linux or Mac OS), you can accomplish this by building Python from the source code.</p>
+
+<p>The new features of Python 3.4 make it very easy to install and start using it in an isolated way that never touches your <code>/usr</code> directory. Unlike Python 3.3 and earlier, you&rsquo;ll be able to quickly get started using <code>venv</code> and <code>pip</code>, and you won&rsquo;t be stuck in the purgatory of missing packages that <code>venv</code> would leave you in on 3.3.</p>
+
+<p>I&rsquo;ve tested these steps on Mac OS 10.9 and Ubuntu 13.10 Saucy Salamander.</p>
+
+<h2>Step 1: C dependencies</h2>
+
+<p>This is a step where it is helpful to be root, if there are dependencies that you need but don&rsquo;t have yet. However, it&rsquo;s not strictly essential; you could install these dependencies under a custom prefix. To keep it simple, though, I&rsquo;m going to assume you can install the dependencies system-wide.</p>
+
+<p>Given that this is the CPython interpreter, you&rsquo;re going to need a C compiler (particularly <code>gcc</code>) to build it. On Mac OS, installing Xcode from the App Store gives everything that you need. On Ubuntu, you can get it with</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo apt-get install build-essential
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Python links to many external libraries to implement parts of its standard library, such as <code>sqlite3</code> and <code>readline</code>. I&rsquo;ve found that if you&rsquo;re missing these libraries, it <em>will</em> compile, but of course you won&rsquo;t be able to use those libraries. The <code>ipython</code> experience in particular will be terrible without those libraries.</p>
+
+<p>On my Mac, I found I had nearly everything that I needed already installed. This might be because I&rsquo;ve already installed Python with Homebrew before, though. I do highly recommend Homebrew as a way of setting up development on a Mac. I was missing <code>ossaudiodev</code> support, which I don&rsquo;t plan to use anyway.</p>
+
+<p>On Ubuntu, this command will install all of the library dependencies:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>sudo apt-get install libc6-dev libreadline-dev libz-dev libncursesw5-dev <span class="se">\</span>
+</span><span class='line'>     libssl-dev libgdbm-dev libsqlite3-dev libbz2-dev liblzma-dev tk-dev
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Step 2: Extract and compile Python</h2>
+
+<p>You&rsquo;re done with the hard part. The rest of the steps are things that should be as smooth as butter in Python 3.4.</p>
+
+<p>Get the current source download from <a href="https://www.python.org/downloads/">https://www.python.org/downloads/</a> . Right now, that&rsquo;ll give you a file called <code>Python-3.4.0.tar.xz</code>. Save it into a directory that you&rsquo;d be happy running Python from, and change to that directory at the command line.</p>
+
+<p>Then run:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>tar xvf Python-3.4.0.tar.gz
+</span><span class='line'><span class="nb">cd </span>Python-3.4.0
+</span><span class='line'>./configure <span class="o">&amp;&amp;</span> make
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Sit back and relax for a few minutes.</p>
+
+<p>At the end, if you were missing any optional libraries, Python will warn you about them. If anything shows up that you would sorely miss, go install the appropriate library, and <code>make</code> again.</p>
+
+<h2>Step 3: Make your Python environment</h2>
+
+<p>We didn&rsquo;t run the traditional last step, <code>sudo make install</code>, because we don&rsquo;t need to! You&rsquo;ve got everything you need to build a local Python environment right here, using Python 3&rsquo;s new <code>venv</code>.</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mkdir -p ~/.virtualenvs
+</span><span class='line'>./python -m venv ~/.virtualenvs/py34
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>To activate this environment, now or in the future, run:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'><span class="nb">source</span> ~/.virtualenvs/py34/bin/activate
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>You could put it in a different directory. I chose this location because it&rsquo;s compatible with Doug Hellmann&rsquo;s <a href="http://virtualenvwrapper.readthedocs.org/en/latest/">virtualenvwrapper</a>. If you have virtualenvwrapper installed, even from a previous version of Python, you can just run <code>workon py34</code> instead. It&rsquo;s totally fine with the fact that this environment was built with <code>venv</code>, not <code>virtualenv</code>.</p>
+
+<p><strong>You are now using Python 3.4</strong>. Type <code>python</code> and play around a bit.</p>
+
+<p>But, of course, it&rsquo;s not really your Python environment until you&rsquo;ve got packages installed. Fortunately, <code>pip</code> is already set up for this new environment!</p>
+
+<p>Just to be sure, type <code>which pip</code>. It should show you a path in your <code>py34/bin</code> directory. If it says something like <code>/usr/bin/pip</code>, either you&rsquo;ve forgotten to activate your environment or something has gone terribly wrong.</p>
+
+<p>Now you can use this copy of <code>pip</code> to install your favorite packages:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pip install requests
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Let&rsquo;s install IPython while we&rsquo;re at it:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>pip install ipython
+</span><span class='line'>ipython3
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>IPython will install itself as <code>ipython3</code>, a compromise for the benefit of less-fortunate users who don&rsquo;t have virtualenvs set up. You could symlink <code>py34/bin/ipython</code> to <code>py34/bin/ipython3</code>, because you won&rsquo;t be needing ipython2 in this environment.</p>
+
+<h2>Deactivating Python 3.4</h2>
+
+<p>When the time comes that you need to work on old code instead of living gloriously in the future, all you need to do is:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>deactivate
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The rest of your system is exactly as you left it until you activate the environment again.</p>
+
+<h2>The not-so-isolated, really easy, bonus version</h2>
+
+<p>If you <em>do</em> have Python 3.4 installed system-wide &mdash; maybe you&rsquo;re on Ubuntu 14.04 already &mdash; then you can skip most of these steps and go straight to making the venv:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='sh'><span class='line'>mkdir -p ~/.virtualenvs
+</span><span class='line'>python3.4 -m venv ~/.virtualenvs/py34
+</span><span class='line'><span class="nb">source</span> ~/.virtualenvs/py34/bin/activate
+</span><span class='line'>pip install ipython
+</span><span class='line'>ipython3
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[U+DEADBEEF: Why you shouldn't trust arbitrary text encodings]]></title>
@@ -88,17 +230,17 @@
 </ul>
 
 
-<p>This covers all the easy cases, leaving us with the mess of encodings that China, Japan, and Korea have created and continue to use because they&rsquo;re too proud to adopt UTF-8. If you intend to have solid support for a CJK language, where you&rsquo;ll probably encounter other problems besides just decoding the text, add some more encodings to your whitelist:</p>
+<p>This covers all the easy cases, leaving us with the mess of encodings that China, Japan, and Korea have created and continue to use instead of UTF-8. If you intend to have solid support for a CJK language, where you&rsquo;ll probably encounter other problems besides just decoding the text, add some more encodings to your whitelist:</p>
 
 <ul>
 <li>If you support Japanese text, you should support <code>Shift-JIS</code> and <code>EUC-JP</code>.</li>
 <li>If you support Korean text, you should support <code>EUC-KR</code>.</li>
 <li>If you support Traditional Chinese text, you should support <code>Big5</code>.</li>
-<li>If you support Simplified Chinese text, you should support <code>GBK</code>.</li>
+<li>If you support Simplified Chinese text, you should support <code>GBK</code> and probably its extension <code>GB18030</code>.</li>
 </ul>
 
 
-<p>I don&rsquo;t know enough about <code>GB18030</code>, the Chinese-centric alternative to UTF-8. It seems incredibly complex, and although it&rsquo;s the official standard of the People&rsquo;s Republic of China, I get the idea that it&rsquo;s not used in practice that much.</p>
+<p>I don&rsquo;t know enough about <code>GB18030</code>, the Chinese-centric alternative to UTF-8. It&rsquo;s the official standard of the People&rsquo;s Republic of China, but it seems remarkably complex. I wouldn&rsquo;t whitelist it in a system that isn&rsquo;t expecting Chinese text, but on the other hand, GB18030 is preferable to GBK because it supports all of Unicode. So if you&rsquo;re going to support GBK, you should probably support GB18030.</p>
 
 <h2>The U+DEADBEEF code</h2>
 
