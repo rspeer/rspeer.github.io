@@ -4,7 +4,7 @@
   <title><![CDATA[Category: python | rspeer]]></title>
   <link href="http://rspeer.github.io/blog/categories/python/atom.xml" rel="self"/>
   <link href="http://rspeer.github.io/"/>
-  <updated>2014-03-31T00:01:54-04:00</updated>
+  <updated>2014-03-31T15:00:15-04:00</updated>
   <id>http://rspeer.github.io/</id>
   <author>
     <name><![CDATA[Rob Speer]]></name>
@@ -66,14 +66,14 @@ sudo apt-get install libc6-dev libreadline-dev libz-dev libncursesw5-dev \</p>
 
 <p>Then run:
 <code>sh
-tar xvf Python-3.4.0.tar.gz
+tar xvf Python-3.4.0.tar.xz
 cd Python-3.4.0
 ./configure &amp;&amp; make
 </code></p>
 
 <p>Sit back and relax for a few minutes.</p>
 
-<p>At the end, if you were missing any optional libraries, Python will warn you about them. If anything shows up that you would sorely miss, go install the appropriate library, and <code>make</code> again.</p>
+<p>At the end, if you were missing any optional libraries, Python will warn you about them. If anything shows up that you would sorely miss, go install the appropriate library, and <code>./configure &amp;&amp; make</code> again.</p>
 
 <h2>Step 3: Make your Python environment</h2>
 
