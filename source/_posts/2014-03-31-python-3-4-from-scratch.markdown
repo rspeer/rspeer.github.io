@@ -47,7 +47,7 @@ Get the current source download from https://www.python.org/downloads/ . Right n
 
 Then run:
 ```sh
-tar xvf Python-3.4.0.tar.gz
+tar xvf Python-3.4.0.tar.xz
 cd Python-3.4.0
 ./configure && make
 ```
