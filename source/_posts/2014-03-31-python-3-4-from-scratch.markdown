@@ -54,7 +54,7 @@ cd Python-3.4.0
 
 Sit back and relax for a few minutes.
 
-At the end, if you were missing any optional libraries, Python will warn you about them. If anything shows up that you would sorely miss, go install the appropriate library, and `make` again.
+At the end, if you were missing any optional libraries, Python will warn you about them. If anything shows up that you would sorely miss, go install the appropriate library, and `./configure && make` again.
 
 ## Step 3: Make your Python environment
 
