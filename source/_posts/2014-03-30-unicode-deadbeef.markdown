@@ -64,14 +64,14 @@ Here are the encodings that I personally think are used often enough to be safe:
 - `Windows-1250` through `Windows-1258`, `ISO-8859-1` through `ISO-8859-15`, and `MacRoman` (although some of these are terribly obscure, they all use the same code)
 - `cp437` (the old IBM character set that's still, to this day, baked into every PC's display hardware)
 
-This covers all the easy cases, leaving us with the mess of encodings that China, Japan, and Korea have created and continue to use because they're too proud to adopt UTF-8. If you intend to have solid support for a CJK language, where you'll probably encounter other problems besides just decoding the text, add some more encodings to your whitelist:
+This covers all the easy cases, leaving us with the mess of encodings that China, Japan, and Korea have created and continue to use instead of UTF-8. If you intend to have solid support for a CJK language, where you'll probably encounter other problems besides just decoding the text, add some more encodings to your whitelist:
 
 - If you support Japanese text, you should support `Shift-JIS` and `EUC-JP`.
 - If you support Korean text, you should support `EUC-KR`.
 - If you support Traditional Chinese text, you should support `Big5`.
-- If you support Simplified Chinese text, you should support `GBK`.
+- If you support Simplified Chinese text, you should support `GBK` and probably its extension `GB18030`.
 
-I don't know enough about `GB18030`, the Chinese-centric alternative to UTF-8. It seems incredibly complex, and although it's the official standard of the People's Republic of China, I get the idea that it's not used in practice that much.
+I don't know enough about `GB18030`, the Chinese-centric alternative to UTF-8. It's the official standard of the People's Republic of China, but it seems remarkably complex. I wouldn't whitelist it in a system that isn't expecting Chinese text, but on the other hand, GB18030 is preferable to GBK because it supports all of Unicode. So if you're going to support GBK, you should probably support GB18030.
 
 ## The U+DEADBEEF code
 
