@@ -1,0 +1,125 @@
+---
+layout: post
+title: "Bachify: A curated Spotify playlist of all\* Bach pieces"
+date: 2014-09-12 00:00:00 -0400
+comments: true
+categories: [music, bach, spotify]
+---
+
+We live in an amazing era. Anybody with a sufficient Internet connection, even
+a wireless connection, can listen to nearly *any piece of music they want to*.
+
+I dimly remember a TV commercial from the mid '90s, advertising a
+telecommunications company by way of advertising the "Information
+Superhighway". A weary traveler in a run-down bar in the desert asks the
+bartender something like "What kind of music you got here?" The bartender
+answers "Everything." The traveler asks for a particular recording of a
+particular piece of classical music, and the bartender immediately puts it on.
+It sounded ludicrous then. It's reality now.
+
+The particular reason I mention this is, I've just spent about 8 months
+listening to the complete works of J. S. Bach, and picking out good recordings
+of all of them. This wasn't my intention at the start. At the start I just
+wanted to discover more good Bach pieces, and put them into a nice deduplicated
+playlist as I did so. But the funny thing is, once you listen to enough Bach,
+something clicks, and *any* Bach piece has the potential to be really good.
+
+I say "potential" because another thing I discovered is that the recording
+*really* matters. For every beautiful, inspired perfomance, there are ten
+performances that range from half-assed to offensive.
+
+There are a few cases of
+compositions by Bach where I think nobody has made the right recording yet. But
+for most of the 1,075-ish pieces in this playlist, I was choosing from multiple
+great options.
+
+Spotify is the thing that made it possible. Spotify is also the thing that made
+it hard, because their organization of classical music is *terrible*. When I
+was halfway done, I even had the misfortune of upgrading to a version of
+Spotify that dumbed down the search feature, so searching became much harder
+until (months later) the Spotify help forums told me about an undocumented
+feature to fix it.
+
+Spotify needs music librarians. I'm not one, but I'll play one on
+the Internet. After all, I've just listened to all\* his compositions, and I want
+to share with you what I found.
+
+## The playlists
+
+Let's get to the point now. Here's the collection. It's broken into five
+playlists to provide a bit of relief to your scrolling fingers. The fact that
+every\* Bach piece is catalogued with a BWV number, and the BWV numbers are
+approximately broken up by what style of work they are, is quite helpful here.
+Let me describe them in broad strokes:
+
+    **[BWV 1-249]**: Big choral works, including the cantatas and masses
+    **[BWV 250-524]**: Chorales and songs. (To be honest, if you listen straight through this playlist in particular, you're gonna have a bad time.)
+    **[BWV 525-770]**: Organ works
+    **[BWV 772-994]**: Keyboard works
+    **[BWV 995-1080]**: Works for orchestras and solo instruments
+    **[BWV 1081-1128]**: Works discovered since 1950
+
+If you're crying foul because there are tracks missing from the 1-249 playlist
+-- that is, every one that's a real Bach piece is in there, but sometimes they
+have a smaller number of movements -- let me explain my reasons and provide you
+with an [unabridged BWV 1-249 playlist].
+
+The movements I skipped were some of the particularly uninteresting
+recitatives. It's my opinion that there's no reason to force yourself to listen
+to many of the recitatives just because you're listening to cantatas. The
+movements of a cantata definitely go together, but you shouldn't have to delay
+your next transcendent listening experience just to listen to someone
+speak-singing about God in German for a while. I think you'd include these
+recitatives if you actually were performing the music in a church service, as
+the cantatas originally were, but if you're just appreciating the music it'll
+work better when some of the recitatives aren't there.
+
+You may disagree with my choices, and that's why I included the unabridged
+playlist as well.
+
+## Searching for Bach
+
+I'll restate that trying to find classical music on Spotify is a pretty bad
+experience. There's just no consistency to how things are labeled. Classical
+music doesn't fit in the hierarchy that every major music player has settled
+on that attempts to describe every track by its "artist", "album", and "song",
+and some ways to mitigate the problem don't exist on Spotify.
+
+In classical music, "albums" are unpredictable and arbitrary. They're not
+grouped by work, they're grouped by how much music you can fit on a CD. The
+"artist" is sometimes the composer, but more often the performer, especially
+when the performance is particularly good (look for the cello suites under
+"Yo-Yo Ma", not "J. S. Bach").
+
+...
+
+## Picking the recordings
+
+It seems that Bach, more than other composers, has motivated some performers to
+plod through an uninspired performance just to get a recording out there.
+
+The worst offenders are the compilation albums that shovel together generic
+recordings for some utilitarian purpose, with names like "Bach for Studying",
+"Bach To Train Your Brain", and worst of all "Smart Babies".
+
+Even the ones that sound well-intentioned, such as "Fifty Essential Bach
+Pieces", are not going to get you the right recordings. This may sound like a
+hypocritical thing for me to say when presenting an enormous Bach compilation,
+but the issue here is that the compilation albums didn't license the best
+performances, just the ones that were most convenient to re-release. I can put
+Glenn Gould on the playlist. They can't.
+
+It's possible for even well-respected ensembles to succumb to blandness. John
+Eliot Gardiner says a lot about this in his recently-published tome, *Music in
+the Castle of Heaven* (which I've read about half of), presenting a narrative
+where he personally saved Bach cantatas from terminal torpor. He rails against
+the famous choir of King's College, Cambridge performing cantatas with precious
+affectedness, aiming for a goal of "loveliness" instead of interestingness and
+inspiration, which spurred Gardiner to start his own ensemble.
+
+It sounds too grandiose to be true, but from recordings I came across on
+Spotify, his story checks out. You can listen to King's College ruining
+cantatas, then listen to the awesome recordings from the Bach Cantata
+Pilgrimage that Gardiner directed, then listen to the much improved King's
+College recordings that came after, such as their unparalleled Magnificat.
+
