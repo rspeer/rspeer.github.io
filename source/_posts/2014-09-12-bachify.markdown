@@ -28,17 +28,16 @@ I say "potential" because another thing I discovered is that the recording
 *really* matters. For every beautiful, inspired perfomance, there are ten
 performances that range from half-assed to offensive.
 
-There are a few cases of
-compositions by Bach where I think nobody has made the right recording yet. But
-for most of the 1,075-ish pieces in this playlist, I was choosing from multiple
-great options.
+There are a few cases of compositions by Bach where I think nobody has made the
+right recording yet. But for most of the 1,075-ish pieces in this playlist, I
+was choosing from multiple great options.
 
 Spotify is the thing that made it possible. Spotify is also the thing that made
-it hard, because their organization of classical music is *terrible*. When I
-was halfway done, I even had the misfortune of upgrading to a version of
-Spotify that dumbed down the search feature, so searching became much harder
-until (months later) the Spotify help forums told me about an undocumented
-feature to fix it.
+it hard, because their organization of classical music is terrible. When I was
+halfway done, I even had the misfortune of upgrading to a version of Spotify
+that dumbed down the search feature, so searching became much harder until
+(months later) the Spotify help forums told me about an undocumented feature to
+fix it.
 
 Spotify needs music librarians. I'm not one, but I'll play one on
 the Internet. After all, I've just listened to all\* his compositions, and I want
@@ -46,36 +45,76 @@ to share with you what I found.
 
 ## The playlists
 
-Let's get to the point now. Here's the collection. It's broken into five
+Let's get to the point now. Here's the collection. It's broken into six
 playlists to provide a bit of relief to your scrolling fingers. The fact that
 every\* Bach piece is catalogued with a BWV number, and the BWV numbers are
 approximately broken up by what style of work they are, is quite helpful here.
-Let me describe them in broad strokes:
+I'll link to the playlists while describing them in broad strokes:
 
-    **[BWV 1-249]**: Big choral works, including the cantatas and masses
-    **[BWV 250-524]**: Chorales and songs. (To be honest, if you listen straight through this playlist in particular, you're gonna have a bad time.)
-    **[BWV 525-770]**: Organ works
-    **[BWV 772-994]**: Keyboard works
-    **[BWV 995-1080]**: Works for orchestras and solo instruments
-    **[BWV 1081-1128]**: Works discovered since 1950
+- **[BWV 1-249][]**: Big choral works, including the cantatas and masses
+    - **[BWV 1-249 unabridged][]**: the same list, including every single recitative
+- **[BWV 250-524][]**: Chorales and songs (To be honest, if you listen straight
+  through this playlist in particular, you're gonna have a bad time.)
+- **[BWV 525-770][]**: Organ works
+- **[BWV 772-994][]**: Keyboard works
+- **[BWV 995-1080][]**: Works for orchestras and solo instruments
+- **[BWV 1081-1128][]**: Works discovered since 1950
+- A list of **[highlights][]**, my favorite 10% or so across all pieces
 
-If you're crying foul because there are tracks missing from the 1-249 playlist
--- that is, every one that's a real Bach piece is in there, but sometimes they
-have a smaller number of movements -- let me explain my reasons and provide you
-with an [unabridged BWV 1-249 playlist].
+Why am I suggesting you listen to an "abridged" version of BWV 1-249 in a complete
+Bach playlist? In that version, I skipped *some* of the particularly uninteresting
+recitative movements. Every cantata is in there, just some of them get to the point
+faster.
 
-The movements I skipped were some of the particularly uninteresting
-recitatives. It's my opinion that there's no reason to force yourself to listen
-to many of the recitatives just because you're listening to cantatas. The
-movements of a cantata definitely go together, but you shouldn't have to delay
-your next transcendent listening experience just to listen to someone
-speak-singing about God in German for a while. I think you'd include these
-recitatives if you actually were performing the music in a church service, as
-the cantatas originally were, but if you're just appreciating the music it'll
-work better when some of the recitatives aren't there.
+It might sound sacrilegious to suggest that Bach wrote some uninteresting
+movements of cantatas, but he *did*, and I've even seen conductors writing
+program notes who said the same. It's my opinion that you shouldn't force
+yourself to listen to these just because you're listening to cantatas.
+Cantatas are an amazing listening experience, an experience you shouldn't have
+to delay while listening to someone speak-singing in German for a while just so
+they can get through all the text.
 
-You may disagree with my choices, and that's why I included the unabridged
-playlist as well.
+I think you'd include these recitatives if you actually were performing the
+music in a church service, as the cantatas originally were, but if you're just
+appreciating the music, it'll work better when some of the recitatives aren't
+there.
+
+There are interesting recitatives too, and there are recitatives that are
+musically important to get from one movement to the next. Those are there, even
+in the abridged version. But you may disagree with my aesthetic choices, and
+that's why I included the [unabridged 1-249 playlist][BWV 1-249 unabridged] as
+well.
+
+[BWV 1-249]: http://open.spotify.com/user/rspeer/playlist/0RkVeCJ3iMVc1MyOdK6E4T
+[BWV 1-249 unabridged]: http://open.spotify.com/user/rspeer/playlist/5oWikObBjaSDasDpMx7AaE
+[BWV 250-524]: http://open.spotify.com/user/rspeer/playlist/2sCCwEMpTXPsOBa0si9Ei2
+[BWV 525-770]: http://open.spotify.com/user/rspeer/playlist/1aGTiGWlnSiGNcJ0HPwqxt
+[BWV 772-994]: http://open.spotify.com/user/rspeer/playlist/4ka3cJd5UCg5EoJqGtwknt
+[BWV 995-1080]: http://open.spotify.com/user/rspeer/playlist/4v8NejHWIKDDSmcTH8ABgV
+[BWV 1081-1128]: http://open.spotify.com/user/rspeer/playlist/5dmTRLVqUi8dB0Mhil5wlB
+[highlights]: http://open.spotify.com/user/rspeer/playlist/0aUzjW2EzpdCt38Yt040Vs
+
+## How should you listen?
+
+This is of course really subjective.
+
+My recommendation is to pick a mostly arbitrary point in one of the playlists,
+but this point should be at the start of a BWV number, or the start of a
+collection such as the Goldberg Variations. Then listen for a while. When you
+get to the end of a piece and you want to hear something different, pick a
+different arbitrary point. Let's call this "manual shuffle".
+
+These playlists won't work well to listen straight through -- if you did that,
+you'd hear all the cantatas first, and all the best-known instrumental pieces
+many days later. It wouldn't be a good mix.
+
+Putting the whole folder of playlists on shuffle wouldn't be a terrible thing to do.
+You'll often hear something from the middle of a work out of context that way, so
+if it interests you, go back and listen to the whole work in order.
+
+The [highlights][] playlist is easier to put on shuffle and slightly better optimized
+for that purpose. But I still recommend the "manual shuffle" technique most of all.
+
 
 ## Searching for Bach
 
@@ -96,9 +135,8 @@ when the performance is particularly good (look for the cello suites under
 ## Picking the recordings
 
 It seems that Bach, more than other composers, has motivated some performers to
-plod through an uninspired performance just to get a recording out there.
-
-The worst offenders are the compilation albums that shovel together generic
+plod through an uninspired performance just to get a recording out there.  The
+worst offenders are the compilation albums that shovel together generic
 recordings for some utilitarian purpose, with names like "Bach for Studying",
 "Bach To Train Your Brain", and worst of all "Smart Babies".
 
@@ -109,17 +147,123 @@ but the issue here is that the compilation albums didn't license the best
 performances, just the ones that were most convenient to re-release. I can put
 Glenn Gould on the playlist. They can't.
 
-It's possible for even well-respected ensembles to succumb to blandness. John
-Eliot Gardiner says a lot about this in his recently-published tome, *Music in
-the Castle of Heaven* (which I've read about half of), presenting a narrative
-where he personally saved Bach cantatas from terminal torpor. He rails against
-the famous choir of King's College, Cambridge performing cantatas with precious
-affectedness, aiming for a goal of "loveliness" instead of interestingness and
-inspiration, which spurred Gardiner to start his own ensemble.
+I found along the way that one really *can* judge a Bach recording by its
+cover.  Here's the cover of a recording from John Eliot Gardiner's "Bach
+Cantata Pilgrimage", a quality series of recordings of all the sacred cantatas
+that makes them sound fresh and new instead of fossilized:
 
-It sounds too grandiose to be true, but from recordings I came across on
-Spotify, his story checks out. You can listen to King's College ruining
-cantatas, then listen to the awesome recordings from the Bach Cantata
-Pilgrimage that Gardiner directed, then listen to the much improved King's
-College recordings that came after, such as their unparalleled Magnificat.
+![Bach Cantata Pilgrimage album cover](/images/gardiner-cover.gif)
+
+If it looks like a National Geographic cover, that's because they got a
+National Geographic photographer to make these inspiring humanist cover photos
+for the whole series of albums.
+
+Meanwhile, here's the cover from "Relax with Mozart Chopin & Bach", whose
+recordings are uninspired and terribly recorded on top of that:
+
+![A bad Bach album cover](/images/shitty-bach.gif)
+
+Ugh. Finally, here's the cover of an album that's seriously called "Classical
+music for read a books":
+
+![A worse Bach album cover](/images/shittier-bach.gif)
+
+Given the level of effort, you might be able to guess what that album contains:
+recordings of public-domain MIDIs.
+
+I found the cover images on Spotify to be important not just as an estimator of
+quality, but also because the easiest way to tell when a track is part of a
+series of related recordings is from the cover art.
+
+After listening to enough recordings, here are the series I ended up choosing
+most of the time they were options:
+
+* Anything with Yo-Yo Ma on cello
+* Glenn Gould's 1980 piano recordings
+* John Eliot Gardiner / Monteverdi Choir / English Baroque Soloists, in their
+  "Bach Cantata Pilgrimage"
+* Masaaki Suzuki and Bach Collegium Japan, also performing cantatas
+* Kevin Bowyer on organ with Det Fynske Kammerkor
+* Simon Preston on organ, on recordings that aren't too ravaged by time
+
+Besides the fact that I often preferred these performers, I looked for variety
+when possible. Because Bach's music is adaptable to so many instruments, I
+sometimes preferred performances that increased the variety of instruments,
+such as organ preludes featuring a trumpet, or Chris Thile playing fugues on
+the banjo.
+
+I could have used Helmuth Rilling's recordings of all the chorales (BWV
+250-438). Helmuth Rilling's ensemble is competent but unexciting, though, so I
+included non-Rilling recordings at many opportunities, even ones whose quality
+might be controversial.
+
+Similarly, even though Gardiner and Suzuki produced excellent recordings of all
+the sacred cantatas, I frequently found recordings by someone else that would
+compare, so in those cases I tended to favor non-Gardiner, non-Suzuki
+recordings to increase the variety.
+
+## \*
+
+I've been saying this is a playlist of all-with-an-asterisk Bach pieces. What's
+with the asterisk?
+
+The problem is just that "all Bach pieces" is a bit hard to define. The goal is to
+have one recording of every authentic Bach piece from BWV 1 to 1128.
+
+Some Bach pieces have been lost to history. Those tend not to have BWV numbers,
+at least. But among the ones that do have BWV numbers:
+
+* BWV 216 only survives in a fragmentary state, and no recordings of it are
+  available on Spotify.
+* BWV 224 is extremely fragmentary -- only 30 measures survive -- and as far as
+  I can tell, those 30 measures have not been recorded anywhere.
+* A number of chorales in BWV 250-438 correspond to organ arrangements in BWV
+  599-644, and sometimes their best recordings put them together in the same
+  track.
+* Some pieces exist that *aren't* in the BWV list. At least one ensemble has
+  recorded a canon that they believe goes between BWV 1077 and BWV 1078. Such
+  pieces are sometimes labeled "BWV deest".
+* Many pieces with BWV numbers have since been deemed to be spurious -- that
+  is, not by Bach at all. I left these out in clear cases.
+
+BWV 216 and 224 are missing from the list out of necessity. I skipped the BWV
+numbers that are considered by broad consensus to be spurious, especially when
+we know which other composer actually wrote it. In cases of doubt, I left the
+piece in the list. And I tried to avoid duplicating tracks, so some pieces in
+BWV 250-438 actually appear somewhere in BWV 599-644 in the order of the list.
+
+So that's what the asterisk is about. The list contains over 1000 unique,
+non-spurious Bach pieces (and probably some spurious ones that we just don't
+know are spurious yet). And that's as close to "all" of them as you can
+possibly get on Spotify.
+
+To understand the list better, you can look at [the Google
+spreadsheet][spreadsheet]
+
+I used for keeping track of the pieces I was adding, which shows the complete
+list of pieces and performers. The gray rows are the numbers left out because
+they're spurious, and the purple rows are duplicates of a recording that
+appears elsewhere.
+
+[spreadsheet]: https://docs.google.com/spreadsheets/d/14eyjieI2cLrj4_y6SWYnmFKd6HbK5hrvVGfSMkxSyl4/edit?usp=sharing
+
+## What did I find when I listened to all of Bach?
+
+I'll be posting some follow-ups about the recordings that were particularly
+interesting, and the ones that are simply too good to not listen to. For now,
+follow the lists and enjoy the music.
+
+## All the links
+
+Here's the links all in one place, for convenience:
+
+- [BWV 1-249][]
+- [BWV 1-249 unabridged][]
+- [BWV 250-524][]
+- [BWV 525-770][]
+- [BWV 772-994][]
+- [BWV 995-1080][]
+- [BWV 1081-1128][]
+- [Highlights of all the lists][highlights]
+- [The spreadsheet of which recordings are included][spreadsheet]
 
