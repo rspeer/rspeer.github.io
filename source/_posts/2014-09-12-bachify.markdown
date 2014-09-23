@@ -34,11 +34,11 @@ for most of the 1,075-ish pieces in this playlist, I was choosing from multiple
 great options.
 
 Spotify is the thing that made it possible. Spotify is also the thing that made
-it hard, because their organization of classical music is *terrible*. When I
-was halfway done, I even had the misfortune of upgrading to a version of
-Spotify that dumbed down the search feature, so searching became much harder
-until (months later) the Spotify help forums told me about an undocumented
-feature to fix it.
+it hard, because their organization of classical music is so bad. When I was
+halfway done, I even had the misfortune of upgrading to a version of Spotify
+that dumbed down the search feature, so searching became much harder until,
+months later, I learned an undocumented trick that fixes it from the Spotify
+help forums. (More on this below.)
 
 Spotify needs music librarians. I'm not one, but I'll play one on
 the Internet. After all, I've just listened to all\* his compositions, and I want
@@ -56,7 +56,7 @@ Let me describe them in broad strokes:
     **[BWV 250-524]**: Chorales and songs. (To be honest, if you listen straight through this playlist in particular, you're gonna have a bad time.)
     **[BWV 525-770]**: Organ works
     **[BWV 772-994]**: Keyboard works
-    **[BWV 995-1080]**: Works for orchestras and solo instruments
+    **[BWV 995-1080]**: Other instrumental works, including those for orchestras and solo instruments
     **[BWV 1081-1128]**: Works discovered since 1950
 
 If you're crying foul because there are tracks missing from the 1-249 playlist
@@ -80,18 +80,51 @@ playlist as well.
 ## Searching for Bach
 
 I'll restate that trying to find classical music on Spotify is a pretty bad
-experience. There's just no consistency to how things are labeled. Classical
-music doesn't fit in the hierarchy that every major music player has settled
-on that attempts to describe every track by its "artist", "album", and "song",
-and some ways to mitigate the problem don't exist on Spotify.
+experience overall. There's just no consistency to how things are labeled.
+Classical music doesn't fit in the hierarchy that every major music player has
+settled on that attempts to describe every track by its "artist", "album", and
+"song", and some ways that other systems kind of mitigate the problem don't
+exist on Spotify.
 
 In classical music, "albums" are unpredictable and arbitrary. They're not
-grouped by work, they're grouped by how much music you can fit on a CD. The
-"artist" is sometimes the composer, but more often the performer, especially
-when the performance is particularly good (look for the cello suites under
-"Yo-Yo Ma", not "J. S. Bach").
+grouped by work, they're grouped by the whims of the label and by how much
+music you can fit on a CD. The "artist" is sometimes the composer, but more
+often the performer, especially when the performance is particularly good (look
+for the cello suites under "Yo-Yo Ma", not "J. S. Bach").
 
-...
+ID3 tags and iTunes have a way to slightly mitigate the "artist" problem, by
+adding "album artist" and "composer" fields. Spotify doesn't have these.
+
+So it would almost sound like there's no way to search for Bach on Spotify
+unless you already know what you're going to find. This is the case for many
+composers. But in Bach's case, BWV numbers save the day.
+
+Classical music labels have known for a long time that BWV numbers are the best
+way to distinguish which Bach piece is which, so nearly every Bach recording
+on Spotify includes the BWV number in its *track title*. To find all the 
+recordings of the Canzona in D Minor, BWV 588, you can just type `"BWV 588"`
+in quotes into the search box. Hooray!
+
+No, just kidding. It used to be that way, but now if you search for `"BWV
+588"`, Spotify will assume you made a typo. The "Most Relevant" hits will be
+for the Goldberg Variations (BWV 988) and the "Little Fugue" in G Minor (BWV
+578).  Somewhat lower on "Most Relevant" you'll find several recordings of BWV
+588, particularly the mediocre ones like "Spooky Bach Halloween" by Joe Fox and
+the Haunted Players.
+
+Finally, at the bottom, you may find the "All Tracks" section, where most of
+the good recordings are exiled for some reason. Or they may be in the other
+section, interspersed with the wrong tracks and the right-but-mediocre ones.
+
+Hope you like this organizational scheme, because the results are not sortable.
+You can't group them by album or sort them by popularity anymore.
+
+But there's a trick. Some brilliant user posted an incantation on the Spotify
+help forums that gets back the old search behavior. You type this into the
+search box:
+
+    spotify:search:"BWV 588"
+
 
 ## Picking the recordings
 
@@ -100,14 +133,15 @@ plod through an uninspired performance just to get a recording out there.
 
 The worst offenders are the compilation albums that shovel together generic
 recordings for some utilitarian purpose, with names like "Bach for Studying",
-"Bach To Train Your Brain", and worst of all "Smart Babies".
+"Bach To Train Your Brain", the aforementioned "Spooky Bach Halloween", and
+worst of all "Smart Babies".
 
 Even the ones that sound well-intentioned, such as "Fifty Essential Bach
-Pieces", are not going to get you the right recordings. This may sound like a
-hypocritical thing for me to say when presenting an enormous Bach compilation,
-but the issue here is that the compilation albums didn't license the best
-performances, just the ones that were most convenient to re-release. I can put
-Glenn Gould on the playlist. They can't.
+Pieces", are not going to get you the right recordings. That may sound like a
+hypocritical thing for me to say when I'm presenting an enormous Bach
+compilation. But the issue here is that the compilation albums didn't license
+the best performances, just the ones that were most convenient to re-release. I
+can put Glenn Gould on the playlist. They can't.
 
 It's possible for even well-respected ensembles to succumb to blandness. John
 Eliot Gardiner says a lot about this in his recently-published tome, *Music in
@@ -118,8 +152,18 @@ affectedness, aiming for a goal of "loveliness" instead of interestingness and
 inspiration, which spurred Gardiner to start his own ensemble.
 
 It sounds too grandiose to be true, but from recordings I came across on
-Spotify, his story checks out. You can listen to King's College ruining
-cantatas, then listen to the awesome recordings from the Bach Cantata
-Pilgrimage that Gardiner directed, then listen to the much improved King's
-College recordings that came after, such as their unparalleled Magnificat.
+Spotify, his story checks out. King's College has many old (you can tell
+they're old because the Spotify year says "2014") recordings on Spotify that
+you could charitably describe as "lovely", if you didn't describe them as
+"boring" or "badly recorded".
+
+Gardiner's series of recordings, the Bach Cantata Pilgrimage (not that you can
+search for that name on Spotify), brings hundreds of cantatas to life in a way
+that most earlier recordings don't. He completes for this claim with a few
+others, particularly Masaaki Suzuki with Bach Collegium Japan, and sometimes
+Ton Koopman and Phillippe Herreweghe. 
+
+And if I'm not just imagining the cause and effect, Gardiner's project seems to
+have prodded King's College into making their own great recordings recently,
+including their unparalleled Magnificat.
 
