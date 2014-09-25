@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Bachify: A curated Spotify playlist of all* Bach pieces"
-date: "2014-09-25 12:00:00 -0400"
+date: "2014-09-25 10:40:00 -0400"
 comments: true
 categories: [music, bach, spotify]
 ---
@@ -25,11 +25,13 @@ listening to the complete works of J. S. Bach, and picking out good recordings
 of all of them. This wasn't my intention at the start. At the start I just
 wanted to discover more good Bach pieces, and put them into a nice deduplicated
 playlist as I did so. But once you listen to enough Bach,
-something clicks, and *any* Bach piece has the potential to be really good.
+something clicks, and *any* Bach piece has the potential to be really good. So
+as the list started filling in and I still wanted to hear even more Bach, I
+decided to finish the job.
 
-I say "potential" because another thing I discovered is that the recording
-*really* matters. For every beautiful, inspired perfomance, there are ten
-performances that range from half-assed to offensive.
+I say "potential" because I found that the recording *really* matters. For
+every beautiful, inspired perfomance, there are ten performances that range
+from dull to tragically bad.
 
 There are a few cases of compositions by Bach where I think nobody has made the
 right recording yet. But for most of the 1,075-ish pieces in this playlist, I
@@ -54,8 +56,7 @@ every\* Bach piece is catalogued with a BWV number, and the BWV numbers are
 approximately sorted by what style of work they are, is quite helpful here.
 I'll link to the playlists while describing them in broad strokes:
 
-- **[BWV 1-249][]**: Big choral works, such as cantatas and masses
-    - **[BWV 1-249 unabridged][]**: the same list, including every single recitative
+- **[BWV 1-249 abridged][]** or **[unabridged][BWV 1-249 unabridged]**: Big choral works, such as cantatas and masses
 - **[BWV 250-524][]**: Chorales and songs
 - **[BWV 525-770][]**: Organ works
 - **[BWV 772-994][]**: Keyboard works
@@ -69,7 +70,7 @@ If you'd prefer a little more focus on quality over quantity -- although the
 quality of things Bach composed is quite high overall -- I also made a
 more-curated list of **[highlights][]**.
 
-[BWV 1-249]: http://open.spotify.com/user/rspeer/playlist/0RkVeCJ3iMVc1MyOdK6E4T
+[BWV 1-249 abridged]: http://open.spotify.com/user/rspeer/playlist/0RkVeCJ3iMVc1MyOdK6E4T
 [BWV 1-249 unabridged]: http://open.spotify.com/user/rspeer/playlist/5oWikObBjaSDasDpMx7AaE
 [BWV 250-524]: http://open.spotify.com/user/rspeer/playlist/2sCCwEMpTXPsOBa0si9Ei2
 [BWV 525-770]: http://open.spotify.com/user/rspeer/playlist/1aGTiGWlnSiGNcJ0HPwqxt
@@ -97,11 +98,12 @@ gonna have a bad time. You'll hear a large number of sacred chorales in
 alphabetical order by their lyrics. It's like reading a hymnal from start to
 finish.
 
-Putting the whole folder of playlists on shuffle wouldn't be a terrible thing
-to do. I wouldn't entirely recommend it, because you'll often hear something
-from the middle of a work out of context that way, but it *is* convenient. If you
-hear a fragment of a work and it interests you, go back and listen to the whole
-work in order.
+Putting all these playlists into a folder and putting the whole folder on
+shuffle wouldn't be a terrible thing to do. I wouldn't entirely recommend it,
+because you'll often hear something from the middle of a work out of context
+that way, but it *is* at least a convenient way to explore. If you hear a
+fragment of a work and it interests you, go back and listen to the whole work
+in order.
 
 The [highlights][] playlist is easier to put on shuffle and slightly better optimized
 for that purpose. But I still recommend the "manual shuffle" technique most of all
@@ -332,5 +334,14 @@ duplicates of a recording that appears somewhere else in the list.
 I'll be posting some follow-ups about the recordings that were particularly
 interesting, and the ones that are simply too good to not listen to. For now,
 follow the lists and enjoy the music.
+
+I'll end with a quote from an unlikely music critic, a great author who would
+have been overjoyed if he had lived to see the Internet become the world's
+greatest music library:
+
+> “Beethoven tells you what it's like to be Beethoven and Mozart tells you
+> what it's like to be human. Bach tells you what it's like to be the universe.”
+>
+> -- Douglas Adams
 
 <img src="/images/bach-wtk-footer.png" class="nobox">
