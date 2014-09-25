@@ -4,7 +4,7 @@
   <title><![CDATA[rspeer]]></title>
   <link href="http://rspeer.github.io/atom.xml" rel="self"/>
   <link href="http://rspeer.github.io/"/>
-  <updated>2014-09-25T10:42:24-04:00</updated>
+  <updated>2014-09-25T10:49:05-04:00</updated>
   <id>http://rspeer.github.io/</id>
   <author>
     <name><![CDATA[Rob Speer]]></name>
@@ -195,9 +195,9 @@ find some good recordings.</p>
 <p>Hope you like this organizational scheme, because the results are not sortable.
 You can&rsquo;t group them by album or sort them by popularity anymore.</p>
 
-<p>But there&rsquo;s a trick. Some brilliant user posted an incantation on the Spotify
-help forums that gets back the old search behavior. You type this into the
-search box:</p>
+<p>But there&rsquo;s a trick. A brilliant user named StevenR
+<a href="http://community.spotify.com/t5/Help-Desktop-Linux-Mac-and/When-will-sort-search-results-by-column-heading-be-restored-to/m-p/760995#M83091">posted an incantation on the Spotify help forums</a>
+that gets back the old search behavior. You type this into the search box:</p>
 
 <pre><code>spotify:search:"BWV 588"
 </code></pre>
