@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "Bachify: A curated Spotify playlist of all* Bach pieces"
-date: "2014-09-23 00:00:00 -0400"
+date: "2014-09-25 12:00:00 -0400"
 comments: true
 categories: [music, bach, spotify]
 ---
@@ -223,7 +223,7 @@ cover.  Here's the cover of a recording from John Eliot Gardiner's "Bach
 Cantata Pilgrimage", a quality series of recordings of all the sacred cantatas
 that makes them sound fresh and new instead of fossilized:
 
-<img src="/images/gardiner-cover.gif" alt="Bach Cantata Pilgrimage album cover" style="max-width: 222px">
+<img src="/images/gardiner-cover.png" alt="Bach Cantata Pilgrimage album cover" style="max-width: 222px">
 
 If it looks like a National Geographic cover, that's because they got a
 National Geographic photographer to make these inspiring humanist cover photos
@@ -240,7 +240,7 @@ music for read a books", performed by "Sweet reading music":
 <img src="/images/shittier-bach.png" alt="A worse Bach album, 'Classical music for read a books'" style="max-width: 222px">
 
 Given the level of effort there, you might be able to guess what that album
-contains: recordings of public-domain MIDIs.
+contains: MIDIs generated from the sheet music.
 
 ## Good series of recordings
 
