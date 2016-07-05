@@ -1,19 +1,19 @@
 ---
 layout: post
-title: "ConceptNet's four years at sea: a database odyssey"
+title: "ConceptNet: a database odyssey"
 date: 2014-07-01
 comments: true
 categories: [conceptnet, database]
 ---
 
-Deep in our cultural consciousness is the idea of an "odyssey". It's an archetypical story where the hero sets out on an adventure in a distant land, but the real story is about the long journey home. At the end, the hero may find that his home has changed considerably, or see it in a new light. The classic example would of course be Homer's Odyssey, but of course there have been many stories of the same form, either directly or indirectly based on the ancient Greek epic. The film *O Brother, Where Art Thou* is an odyssey in every sense, of course, but so are many other stories that are less explicit about the storytelling tradition they come from.
+Ancient storytelling has given us the idea of an "odyssey": an archetypical story where the hero sets out on an adventure in a distant land, but the real story is about the long journey home. At the end, the hero may find that his home has changed considerably, or see it in a new light. The classic example would of course be Homer's Odyssey. There have been many stories of the same form, either directly or indirectly based on the ancient Greek epic. The film *O Brother, Where Art Thou* is an odyssey in every sense, of course, but so are many other stories that are less explicit about the storytelling tradition they come from.
 
-The hero of the odyssey I'll be telling here is [ConceptNet](http://conceptnet5.media.mit.edu), an open knowledge representation project based at the MIT Media Lab. ConceptNet is a multilingual collaboration with contributors from all over the world, but I've been the primary maintainer for a long time, including for the entirety of the current major version, ConceptNet 5.
+The hero of the odyssey I'll be telling here is [ConceptNet](http://conceptnet5.media.mit.edu), an open knowledge representation project based at the MIT Media Lab. ConceptNet is a multilingual collaboration with contributors from all over the world, but I've been the primary maintainer for a long time, including for the entirety of the current major version, ConceptNet 5. 
 
-The feedback I hear about ConceptNet 5 is pretty consistent: it seems like it should be a great improvement over previous versions, but in practical terms, people find the data really hard to get at. They'd often rather use ConceptNet 4, which has much less data, and its representation is entangled in an old version of Django. Or sometimes they'd even use ConceptNet 2, despite its totally crazy representation, just because it still has all the Googlejuice.
+ConceptNet has spent years wandering the seas in search of a good representation. The feedback I hear about ConceptNet 5 has been pretty consistent: it seems like it should be a great improvement over previous versions, but in practical terms, people find the data really hard to get at. They'd often rather use ConceptNet 4, which has much less data, and its representation is entangled in an old version of Django. Or sometimes they'd even use ConceptNet 2, despite its totally crazy representation, just because it still has all the Googlejuice.
 
 
-## Our starting point: SQLite and PostgreSQL
+## Our starting point (2008): SQLite and PostgreSQL
 
 If you wanted to get at ConceptNet 4 programmatically, you had to do it with the object-relational mapper in Django 1.2.
 
@@ -44,14 +44,14 @@ A ConceptNet assertion is an object that we can describe. We can, for example, a
 
 That doesn't mean you're stuck if you want to represent ConceptNet-like data in RDF. What you have to do is *reify* each object.
 
-If you want to assert that a dog has a tail, for example, it would be tempting to use the triple `<dog> <HasA> <tail>`, but then there's no way to refer to or refine that information. The reified version looks more like this:
+If you want to assert that a dog has a tail, for example, it would be tempting to use the triple `<dog> <HasA> <tail>`, but then there's no way to refer to that information or to give it more detail. The reified version looks more like this:
 
     <assertion #628318> <SUBJECT> <dog>
     <assertion #628318> <RELATION> <HasA>
     <assertion #628318> <OBJECT> <tail>
     <assertion #628318> <WEIGHT> 3.0
 
-...and so on. Then assertion #628318 is still something you can refer to later.
+...and so on. Then assertion #628318 is something you can refer to later.
 
 Lots of data is represented this way, so this wasn't a reason to give up on RDF. The reason to give up on RDF was looking around at the available technologies for actually storing and querying these RDF triples. Python's `rdflib`, at the time, supported an assortment of different data backends, all of which were incomplete or unusable in one way or another except the one called `:memory:`, and you can guess how that one worked. One option in RDFlib, along with the beefier Java implementations of RDF that some people said I should be using, offered to store the triples in a SQL database, which struck me as very similar to the situation with ConceptNet 4 except even harder to update, because the data would no longer be structured appropriately and the joins would be even more horrible.
 
@@ -59,7 +59,7 @@ Nowadays RDFlib wants you to use BerkeleyDB, which is, coincidentally, the datab
 
 The big question the RDF representation leaves you with is: how do you query your data once you've turned it into triples? And the common answer you'll get is "SPARQL". SPARQL is not the answer. SPARQL is not even computationally feasible. It's basically a denial of service attack against your own computer.
 
-So that's where the Semantic Web approach would leave me: with reified data scattered to the wind, with no good way to query it, and *still* with a difficult decision about how to actually store it on a disk. After a couple of weeks of experimentation, I soon abandoned this idea.
+So that's where the Semantic Web approach would leave me: with reified data scattered to the wind, with no good way to query it, and *still* with a difficult decision about how to actually store it on a disk. After a couple of weeks of experimentation, I abandoned this idea.
 
 
 ## Neo4j (2011)
@@ -70,7 +70,7 @@ Starting this process was *fun*. We could visualize the data we were putting in 
 
 Things started to go bad when we actually tried to import the millions of assertions in ConceptNet into Neo4j. See, Neo4j didn't have *any* kind of data importer. The recommended way to make a Neo4j graph was to copy it from another Neo4j graph you already had. There were some experimental scripts for importing from some vaguely-standardized graph languages, except they broke after a few thousand edges.
 
-I tried sending the assertions one at a time to Neo4j's HTTP API, and gave up on that when I realized that I would need to accomplish some research in the *months* this would take to complete. I tried writing some clever Groovy code that would try to create batches of edges out of data it read from a flat file, and found that this crashed the entire Neo4j server due to running out of "PermGen". This is a situation that if you describe it to a Java programmer, they'll know what you're talking about and nod sadly, while no other sort of programmer has ever had to worry about "PermGen".
+I tried sending the assertions one at a time to Neo4j's HTTP API, and gave up on that when I realized that I would need to accomplish some research in the *months* this would take to complete. I tried writing some clever Gremlin code that would try to create batches of edges out of data it read from a flat file, and found that this crashed the entire Neo4j server due to running out of "PermGen". This is a situation that if you describe it to a Java programmer, they'll know what you're talking about and nod sadly, while no other sort of programmer has ever had to worry about "PermGen".
 
 Other problems with the server started to reveal themselves. Despite Neo4j's free academic license, we'd be missing many of the features -- such as any way to distribute the data between multiple computers -- unless we bought the expensive enterprise license. And the shiny Web interface, when running, gave the entire Internet read-write access to the graph. The Neo4j community seemed surprisingly calm about this fact. There was an option to restrict it to localhost, in theory, but it didn't work. If you tried to take matters into your own hands and start firewalling and proxying things in an attempt to enforce some security, various parts of the Javascript interface would stop working.
 
@@ -87,14 +87,16 @@ Once the indexed data was loaded, I found MongoDB to be rather a resource hog. I
 
 Sharding! Distributed data! This was exciting! I successfully imported all the data, and I even put up an API so that people everywhere could query ConceptNet 5 like they were able to query ConceptNet 4.
 
-Now that it's 2014, you're probably shaking your head sadly. You do not want to shard MongoDB. You especially did not want to shard MongoDB in 2011. "MongoDB is web scale", they said, to distract you from the fundamental impossibility of scaling MongoDB. There were nodes that would go down and could never be convinced to come up again, there was inscrutable data loss due to the default settings being completely unsafe and the safe settings being unusably slow, and there was the occasional need to "rebalance", which would unfortunately block every node's single thread of operation for, say, 24 hours. I could not *afford* to run an independent copy of MongoDB, so whenever I did anything that required any sort of rebalancing, ConceptNet 5 would go down. For everybody. For a day or so.
+Now that it's 2014, you're probably shaking your head sadly. You do not want to shard MongoDB. You especially did not want to shard MongoDB in 2011. It's now quite popular to make fun of the marketing statement "MongoDB is web scale", as it contrasts amusingly with the fundamental impossibility of scaling MongoDB. There were nodes that would go down and could never be convinced to come up again, there was inscrutable data loss due to the default settings being completely unsafe and the safe settings being unusably slow, and there was the occasional need to "rebalance", which would unfortunately block every node's single thread of operation for, say, 24 hours. I could not *afford* to run an independent copy of MongoDB, so whenever I did anything that required any sort of rebalancing, ConceptNet 5 would go down. For everybody. For a day or so.
 
 But the paper was written and the code was released, so ConceptNet 5.0 consisted of a couple of MongoDBs.
 
 
 ## A note about MapReduce
 
-MongoDB was also my first experience with a database that promised the siren song of "MapReduce". Many providers of NoSQL databases will, by way of apologizing that you can't "join" anymore, happily tell you that their database can do MapReduce, which is *better* than a join because it's distributed and functional and was invented by magical unicorns at Google. Whereas previously you had to invoke a relational operation that has been well understood for decades, now you can run *arbitrary code* in your database's *only thread* that sends gigabytes of data across a network socket for *no good reason*! Excited yet?
+MongoDB was also my first experience with a database that promised the siren song of "MapReduce". Many providers of NoSQL databases will, by way of apologizing that you can't "join" anymore, happily tell you that their database can do MapReduce, which is *better* than a join because it's distributed and functional and was invented by magical unicorns at Google.
+
+Whereas previously you had to invoke a relational operation that has been well understood for decades, now you can run *arbitrary code* in your database's *only thread* that sends gigabytes of data across a network socket for *no good reason*! Excited yet?
 
 MapReduce was created for a situation where you have more data than you can even fit on a computer. You lose orders of magnitude of efficiency, because any interesting result that you compute will eventually have to be sent over a network. You can no longer take advantage of locality of reference in your data; you have to read it all in anew at every step. But maybe you settle for this, because it gives you an obvious way to scale your code in parallel, and might even give you the ability to compute things you would not otherwise have the resources to compute.
 
@@ -103,7 +105,9 @@ Here are some situations where it makes absolutely no sense to use MapReduce:
 1. Your data fits on a single hard disk
 2. Your code runs in a single thread
 
-These are also basically requirements for using MongoDB. MongoDB multiplies the size of your data by a huge factor and then expects the important parts of it to fit in RAM somewhere. If you hadn't put it into MongoDB, it would fit comfortably on a hard disk. A *cheap* hard disk. And MongoDB is thoroughly single-threaded, so you get no advantage from parallelism unless you buy a whole lot of computers and let 7/8 of their cores go to waste.
+These are also basically requirements for using MongoDB. MongoDB multiplies the size of your data by a huge factor and then expects the important parts of it to fit in RAM somewhere. If you hadn't put it into MongoDB, it would fit comfortably on a hard disk. A *cheap* hard disk. And MongoDB is thoroughly single-threaded, so you get no advantage from parallelism unless you buy a whole lot of computers and let 3/4 of their cores go to waste.
+
+Now, before you think this is just the usual, fashionable Mongo-bashing, let me point out that they are not at all alone in the foolish use of MapReduce.
 
 I have since tried Riak. Not for ConceptNet, but for things at Luminoso. To their credit, Riak has thought through some difficult issues of distributed data much more thoroughly than MongoDB has, though they fall behind on aspects like importing data quickly, or being able to provide diagnostic messages that aren't mysterious blobs of Erlang that look like `{error, <100,105,115,107,32,105,115,32,111,110,32,102,105,114,101,44,32,121,111>}`. But I digress.
 
@@ -111,7 +115,7 @@ For some reason, despite seeming like otherwise reasonable people who have thoug
 
 If you keep asking the friendly Riak mailing list, you eventually get a clearer answer about when it's a good time to run MapReduce in your database, which is never. This is not a fact about Riak, really, it's about how MapReduce and databases are fundamentally different applications.
 
-Putting a MapReduce command in a database is just as silly as putting a self-destruct button on a space shuttle. In both cases, you'd be basing your design on a work of fiction that exaggerates reality, like a campy sci-fi movie, or a paper Google publishes about their internal operations. And in both cases, you'll have to strongly warn people not to press the button, when it would have been a better idea to not put the button there in the first place.
+I'm convinced that the only people who ever benefit from a database's ability to MapReduce are the salespeople for that database. Recently, the news I heard about RethinkDB made me consider giving it a try. But I notice that "MapReduce" is one of their prominently advertised features, making me think that the database is optimized for sales over efficiency like so many others.
 
 
 ## Solr (2012)
